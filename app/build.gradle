@@ -1,0 +1,40 @@
+apply plugin: 'android'
+apply plugin: 'maven'
+
+repositories {
+    maven { url '/home/fork/Code/forkch-mvn-repo' }
+    mavenCentral()
+    maven { url 'https://raw.github.com/forkch/forkch-mvn-repo/master' }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:19.+'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile('ch.fork.adhocrailway:ch.fork.adhocrailway.persistence.adhocserver:2.2.1') {
+        exclude group: 'xmlpull'
+        exclude group: 'xpp3'
+    }
+    compile('ch.fork.adhocrailway:ch.fork.adhocrailway.railway.srcp:2.2.1') {
+        exclude group: 'xmlpull'
+        exclude group: 'xpp3'
+    }
+}
+
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.0.3'
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 19
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
