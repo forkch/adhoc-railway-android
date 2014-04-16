@@ -4,6 +4,7 @@ import android.app.Application;
 
 import java.util.SortedSet;
 
+import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
 
 /**
@@ -13,6 +14,7 @@ public class AdHocRailwayApplication extends Application {
 
 
     private SortedSet<LocomotiveGroup> locomotiveGroups;
+    private Locomotive selectedLocomotive;
 
     public void setLocomotiveGroups(SortedSet<LocomotiveGroup> locomotiveGroups) {
         this.locomotiveGroups = locomotiveGroups;
@@ -20,5 +22,13 @@ public class AdHocRailwayApplication extends Application {
 
     public SortedSet<LocomotiveGroup> getLocomotiveGroups() {
         return locomotiveGroups;
+    }
+
+    public void setSelectedLocomotive(Locomotive selectedLocomotive) {
+        this.selectedLocomotive = selectedLocomotive;
+    }
+
+    public Locomotive getSelectedLocomotive() {
+        return selectedLocomotive;
     }
 }

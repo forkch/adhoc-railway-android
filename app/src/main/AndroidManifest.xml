@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/adhoc_railway_64"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         android:name=".AdHocRailwayApplication">
@@ -19,16 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ch.fork.adhocrailway.android.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName="ch.fork.adhocrailway.android.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="MainActivity" />
-        </activity>
-        <activity
             android:name="ch.fork.adhocrailway.android.LocomotiveSelectActivity"
-            android:label="@string/title_activity_locomotive_select"
             android:parentActivityName="ch.fork.adhocrailway.android.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

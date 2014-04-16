@@ -1,0 +1,16 @@
+<resources>
+    <color name="bring_green">#7fcaae</color>
+    <color name="bring_green_pressed">#72bda2</color>
+    <color name="bring_red">#e74c3c</color>
+    <color name="bring_red_pressed">#d63c30</color>
+    <color name="bring_black">#2b3136</color>
+    <color name="bring_black_dark">#23292c</color>
+    <color name="bring_black_dark_dark">#202122</color>
+    <color name="bring_black_dark_dark_pressed">#171819</color>
+    <color name="bring_gray">#5f656c</color>
+    <color name="bring_gray_light">#d3d3d3</color>
+    <color name="bring_gray_light_pressed">#c6c6c6</color>
+    <color name="bring_gray_dark">#353a3e</color>
+    <color name="bring_creme">#f6f6f6</color>
+    <color name="bring_white">#ffffff</color>
+</resources>

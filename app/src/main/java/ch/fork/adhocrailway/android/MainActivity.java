@@ -7,6 +7,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.SortedSet;
 import java.util.UUID;
@@ -50,12 +54,6 @@ public class MainActivity extends Activity implements LocomotiveServiceListener,
 
         rest.execute();
 
-        /*SortedSet<TurnoutGroup> allTurnoutGroups = restTurnoutService.getAllTurnoutGroups();
-        for (TurnoutGroup allTurnoutGroup : allTurnoutGroups) {
-            Log.d("", String.valueOf(allTurnoutGroup));
-        }*/
-
-
         AsyncTask<Void, Void, Void> switchTurnout = new AsyncTask<Void, Void, Void>() {
 
 
@@ -84,6 +82,28 @@ public class MainActivity extends Activity implements LocomotiveServiceListener,
 
         switchTurnout.execute();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AdHocRailwayApplication application = (AdHocRailwayApplication) getApplication();
+        FrameLayout viewById = (FrameLayout) findViewById(R.id.selectedLocomotive);
+
+        LinearLayout locomotiveRowView = (LinearLayout) getLayoutInflater().inflate(R.layout.locomotive_row, null);
+        TextView label = (TextView) locomotiveRowView.findViewById(R.id.label);
+        ImageView imageView = (ImageView)locomotiveRowView.findViewById(R.id.icon);
+
+        viewById.removeAllViews();
+        viewById.addView(locomotiveRowView);
+        Locomotive selectedLocomotive = application.getSelectedLocomotive();
+        if(selectedLocomotive != null) {
+            label.setText(selectedLocomotive.getName());
+            ImageHelper.fillImageViewFromBase64ImageString(imageView, selectedLocomotive.getImageBase64());
+        } else {
+            label.setText("no locomotive selected");
+            imageView.setImageBitmap(null);
+        }
     }
 
     public void onSelectLocomotiveClick(View view) {

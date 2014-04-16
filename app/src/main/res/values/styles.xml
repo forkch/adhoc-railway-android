@@ -1,8 +1,101 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="android:Theme.Holo">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+
+        <item name="android:windowBackground">@color/bring_black</item>
+        <item name="android:actionBarStyle">@style/BringActionBar</item>
+        <item name="android:dropDownItemStyle">@style/BringDropDownItemStyle</item>
+        <item name="android:listViewStyle">@style/AppTheme.Widget.ListView</item>
+
+    </style>
+
+    <style name="ProgressDialog" parent="android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+    </style>
+
+    <style name="AppTheme.Widget.ListView" parent="@android:style/Widget.ListView">
+        <item name="android:divider">@color/bring_black_dark</item>
+        <item name="android:dividerHeight">1dip</item>
+        <item name="android:listSelector">@drawable/bring_list_item_background</item>
+        <item name="android:layout_margin">0dip</item>
+        <item name="android:padding">0dip</item>
+    </style>
+
+    <!-- Action Bar -->
+    <style name="BringActionBar"
+        parent="@android:style/Widget.Holo.ActionBar.Solid">
+        <item name="android:background">@drawable/bring_action_bar</item>
+    </style>
+
+    <!-- Drop Down Item -->
+    <style name="BringDropDownItemStyle"
+        parent="@android:style/Widget.Holo.DropDownItem">
+        <item name="android:background">@color/bring_black</item>
+        <item name="android:textColor">@color/bring_white</item>
+        <item name="android:textSize">@dimen/bring_default_textSize</item>
+    </style>
+
+    <!-- Buttons -->
+    <style name="AppTheme.Button" parent="@android:style/Widget.Button">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textSize">@dimen/bring_default_textSize</item>
+    </style>
+
+    <style name="AppTheme.Button.Primary">
+        <item name="android:padding">5dp</item>
+        <item name="android:background">@drawable/bring_button_primary</item>
+        <item name="android:textColor">@color/bring_white</item>
+    </style>
+
+    <style name="AppTheme.Button.Secondary">
+        <item name="android:background">@drawable/bring_button_secondary</item>
+        <item name="android:textColor">@color/bring_gray</item>
+    </style>
+
+    <style name="AppTheme.Button.Alert">
+        <item name="android:background">@drawable/bring_button_alert</item>
+        <item name="android:textColor">@color/bring_white</item>
+    </style>
+
+    <style name="AppTheme.Button.Dark">
+        <item name="android:background">@drawable/bring_button_dark</item>
+        <item name="android:textColor">@color/bring_white</item>
+    </style>
+
+    <style name="AppTheme.TextView.Link">
+        <item name="android:textColor">@color/bring_gray_light</item>
+        <item name="android:paddingBottom">@dimen/bring_padding</item>
+        <item name="android:paddingTop">@dimen/bring_padding</item>
+
+    </style>
+
+    <style name="AppTheme.TextView">
+        <item name="android:textSize">@dimen/bring_default_textSize</item>
+        <item name="android:textColor">@color/bring_white</item>
+    </style>
+
+    <style name="AppTheme.SectionText" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/bring_gray_light</item>
+        <item name="android:textSize">22sp</item>
     </style>
 
 </resources>

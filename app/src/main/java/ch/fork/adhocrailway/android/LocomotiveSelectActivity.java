@@ -5,31 +5,49 @@ import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
 
 
 public class LocomotiveSelectActivity extends ListActivity {
+
+    private List<Locomotive> locomotives;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locomotive_select);
 
-        AdHocRailwayApplication adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
-        List<String> values = new ArrayList<String>();
+        ListView listView = getListView();
+
+        final AdHocRailwayApplication adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
+        locomotives = new ArrayList<Locomotive>();
 
         for (LocomotiveGroup locomotiveGroup : adHocRailwayApplication.getLocomotiveGroups()) {
-            values.add(locomotiveGroup.getName());
+                locomotives.addAll(locomotiveGroup.getLocomotives());
         }
-        ArrayAdapter<String> locomotivesArray = new ArrayAdapter<String>(this, R.layout.locomotive_row, R.id.label
-                ,values);
 
-        setListAdapter(locomotivesArray);
+        LocomotiveListAdapter locomotiveListAdapter = new LocomotiveListAdapter(this, locomotives);
+
+        setListAdapter(locomotiveListAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                adHocRailwayApplication.setSelectedLocomotive(locomotives.get(position));
+                onBackPressed();
+            }
+        });
+
     }
 
 

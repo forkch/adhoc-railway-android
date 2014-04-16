@@ -1,10 +1,16 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="${packageName}.${activityClass}">
-
+    tools:context="${packageName}.${activityClass}"
+    android:orientation="vertical">
+    
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:id="@+id/selectedLocomotive"/>
     <Button
+        style="@style/AppTheme.Button.Primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Select Locomotive"
@@ -13,4 +19,4 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:onClick="onSelectLocomotiveClick" />
-</RelativeLayout>
+</LinearLayout>
