@@ -1,18 +1,16 @@
 package ch.fork.adhocrailway.android;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
@@ -32,8 +30,11 @@ public class LocomotiveSelectActivity extends ListActivity {
         final AdHocRailwayApplication adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
         locomotives = new ArrayList<Locomotive>();
 
-        for (LocomotiveGroup locomotiveGroup : adHocRailwayApplication.getLocomotiveGroups()) {
+        SortedSet<LocomotiveGroup> locomotiveGroups = adHocRailwayApplication.getLocomotiveGroups();
+        if (locomotiveGroups != null) {
+            for (LocomotiveGroup locomotiveGroup : locomotiveGroups) {
                 locomotives.addAll(locomotiveGroup.getLocomotives());
+            }
         }
 
         LocomotiveListAdapter locomotiveListAdapter = new LocomotiveListAdapter(this, locomotives);
@@ -53,7 +54,7 @@ public class LocomotiveSelectActivity extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.locomotive_select, menu);
         return true;

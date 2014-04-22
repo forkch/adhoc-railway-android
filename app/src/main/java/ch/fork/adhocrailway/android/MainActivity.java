@@ -1,40 +1,26 @@
 package ch.fork.adhocrailway.android;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.util.SortedSet;
-import java.util.UUID;
-
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
-import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
-import ch.fork.AdHocRailway.model.turnouts.Turnout;
-import ch.fork.AdHocRailway.model.turnouts.TurnoutGroup;
-import ch.fork.AdHocRailway.model.turnouts.TurnoutState;
-import ch.fork.AdHocRailway.model.turnouts.TurnoutType;
-import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestLocomotiveService;
-import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestTurnoutService;
-import ch.fork.AdHocRailway.persistence.adhocserver.impl.socketio.SIOService;
-import ch.fork.AdHocRailway.persistence.adhocserver.impl.socketio.ServiceListener;
-import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
-import ch.fork.AdHocRailway.services.AdHocServiceException;
-import ch.fork.AdHocRailway.services.LocomotiveServiceListener;
-import ch.fork.AdHocRailway.services.TurnoutServiceListener;
-import de.dermoba.srcp.client.SRCPSession;
-import de.dermoba.srcp.common.exception.SRCPException;
 
-public class MainActivity extends Activity implements LocomotiveServiceListener, ServiceListener {
+public class MainActivity extends Activity {
 
     private AdHocRailwayApplication adHocRailwayApplication;
+
+    private StringBuffer enteredNumberKeys = new StringBuffer();
+    private TextView currentNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,62 +28,46 @@ public class MainActivity extends Activity implements LocomotiveServiceListener,
         setContentView(R.layout.activity_main);
 
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
-        AsyncTask<Void, Void, Void> rest = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                RestLocomotiveService restLocomotiveService = new RestLocomotiveService("http://10.0.2.2:3000", UUID.randomUUID().toString());
-                restLocomotiveService.init(MainActivity.this);
-                SIOService.getInstance().connect("http://10.0.2.2:3000", MainActivity.this);
-                return null;
-            }
-        };
 
-        rest.execute();
+        currentNumber = (TextView) findViewById(R.id.currentNumber);
 
-        AsyncTask<Void, Void, Void> switchTurnout = new AsyncTask<Void, Void, Void>() {
-
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    SRCPSession session = new SRCPSession("10.0.2.2", 4303);
-                    session.connect();
-
-
-                    SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter();
-                    srcpTurnoutControlAdapter.setSession(session);
-                    Turnout turnout = new Turnout();
-                    turnout.setBus1(1);
-                    turnout.setAddress1(1);
-                    turnout.setDefaultState(TurnoutState.STRAIGHT);
-                    turnout.setType(TurnoutType.DEFAULT_LEFT);
-
-                    srcpTurnoutControlAdapter.setCurvedLeft(turnout);
-                } catch (SRCPException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-
-        switchTurnout.execute();
+        initEventHandling();
 
     }
+
+    private void initEventHandling() {
+        SeekBar locomotive1Seekbar = (SeekBar) findViewById(R.id.locomotive1Speed);
+        locomotive1Seekbar.setOnSeekBarChangeListener(new Locomotive1SpeedListener());
+
+        Button directionButton = (Button) findViewById(R.id.locomotive1Direction);
+        directionButton.setOnClickListener(new Locomotive1DirectionListener());
+
+        Button stopButton = (Button) findViewById(R.id.locomotive1Stop);
+        stopButton.setOnClickListener(new Locomotive1StopListener());
+
+        for (int i = 0; i < 10; i++) {
+            Button turnoutButton = (Button) findViewById(getResources().getIdentifier("turnoutButton" + i, "id", getPackageName()));
+            turnoutButton.setOnClickListener(new NumberButtonClickListener(i));
+
+        }
+
+    }
+
 
     @Override
     protected void onResume() {
         super.onResume();
-        AdHocRailwayApplication application = (AdHocRailwayApplication) getApplication();
+        adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
         FrameLayout viewById = (FrameLayout) findViewById(R.id.selectedLocomotive);
 
         LinearLayout locomotiveRowView = (LinearLayout) getLayoutInflater().inflate(R.layout.locomotive_row, null);
         TextView label = (TextView) locomotiveRowView.findViewById(R.id.label);
-        ImageView imageView = (ImageView)locomotiveRowView.findViewById(R.id.icon);
+        ImageView imageView = (ImageView) locomotiveRowView.findViewById(R.id.icon);
 
         viewById.removeAllViews();
         viewById.addView(locomotiveRowView);
-        Locomotive selectedLocomotive = application.getSelectedLocomotive();
-        if(selectedLocomotive != null) {
+        Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
+        if (selectedLocomotive != null) {
             label.setText(selectedLocomotive.getName());
             ImageHelper.fillImageViewFromBase64ImageString(imageView, selectedLocomotive.getImageBase64());
         } else {
@@ -111,67 +81,96 @@ public class MainActivity extends Activity implements LocomotiveServiceListener,
         startActivity(selectLocomotiveIntent);
     }
 
-    @Override
-    public void locomotiveAdded(Locomotive locomotive) {
-
-        Log.d("", String.valueOf(locomotive));
+    private void resetNumbers() {
+        enteredNumberKeys = new StringBuffer();
+        currentNumber.setText("---");
     }
 
-    @Override
-    public void locomotiveUpdated(Locomotive locomotive) {
+    private class NumberButtonClickListener implements View.OnClickListener {
+        private int number;
 
-        Log.d("", String.valueOf(locomotive));
+        public NumberButtonClickListener(int number) {
+            this.number = number;
+        }
+
+        @Override
+        public void onClick(View v) {
+            enteredNumberKeys.append(number);
+            final int currentEnteredNumber = Integer.parseInt(enteredNumberKeys.toString());
+            Log.i(MainActivity.class.getSimpleName(), "current entered number: " + currentEnteredNumber);
+            if (currentEnteredNumber > 999) {
+                resetNumbers();
+                return;
+            }
+            currentNumber.setText("" + currentEnteredNumber);
+        }
+
     }
 
-    @Override
-    public void locomotiveRemoved(Locomotive locomotive) {
+    private class Locomotive1SpeedListener implements SeekBar.OnSeekBarChangeListener {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, final int progress, boolean fromUser) {
+            final Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
+            if (selectedLocomotive == null) {
+                return;
+            }
 
-        Log.d("", String.valueOf(locomotive));
+            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    adHocRailwayApplication.getSrcpLocomotiveControlAdapter().setSpeed(selectedLocomotive, progress, selectedLocomotive.getCurrentFunctions());
+                    return null;
+                }
+            };
+            asyncTask.execute();
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
     }
 
-    @Override
-    public void locomotiveGroupAdded(LocomotiveGroup group) {
+    private class Locomotive1DirectionListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            final Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
+            if (selectedLocomotive == null) {
+                return;
+            }
 
-        Log.d("", String.valueOf(group));
+            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    adHocRailwayApplication.getSrcpLocomotiveControlAdapter().toggleDirection(selectedLocomotive);
+                    return null;
+                }
+            };
+            asyncTask.execute();
+        }
     }
 
-    @Override
-    public void locomotiveGroupUpdated(LocomotiveGroup group) {
+    private class Locomotive1StopListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            final Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
+            if (selectedLocomotive == null) {
+                return;
+            }
+            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
-        Log.d("", String.valueOf(group));
-    }
-
-    @Override
-    public void locomotiveGroupRemoved(LocomotiveGroup group) {
-
-        Log.d("", String.valueOf(group));
-    }
-
-    @Override
-    public void locomotivesUpdated(SortedSet<LocomotiveGroup> locomotiveGroups) {
-        Log.d("", String.valueOf(locomotiveGroups));
-        adHocRailwayApplication.setLocomotiveGroups(locomotiveGroups);
-    }
-
-    @Override
-    public void failure(AdHocServiceException arg0) {
-        Log.e("", "error");
-    }
-
-    @Override
-    public void connected() {
-        Log.d("", "connected");
-    }
-
-    @Override
-    public void connectionError(AdHocServiceException ex) {
-
-        Log.e("", "error");
-    }
-
-    @Override
-    public void disconnected() {
-
-        Log.d("", "disconnected");
+                @Override
+                protected Void doInBackground(Void... params) {
+                    adHocRailwayApplication.getSrcpLocomotiveControlAdapter().setSpeed(selectedLocomotive, 0, selectedLocomotive.getCurrentFunctions());
+                    return null;
+                }
+            };
+            asyncTask.execute();
+        }
     }
 }
