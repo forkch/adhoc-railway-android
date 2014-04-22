@@ -14,6 +14,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
+import ch.fork.AdHocRailway.model.turnouts.Turnout;
+import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 
 public class MainActivity extends Activity {
 
@@ -48,9 +50,44 @@ public class MainActivity extends Activity {
         for (int i = 0; i < 10; i++) {
             Button turnoutButton = (Button) findViewById(getResources().getIdentifier("turnoutButton" + i, "id", getPackageName()));
             turnoutButton.setOnClickListener(new NumberButtonClickListener(i));
-
         }
 
+        Button defaultStateButton = (Button) findViewById(R.id.turnoutButtonDefault);
+        defaultStateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(getEnteredNumber());
+                        SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = adHocRailwayApplication.getSrcpTurnoutControlAdapter();
+                        srcpTurnoutControlAdapter.setDefaultState(turnoutByNumber);
+                        resetNumbers();
+                        return null;
+                    }
+                };
+                asyncTask.execute();
+            }
+        });
+        Button nonDefaultStateButton = (Button) findViewById(R.id.turnoutButtonNonDefault);
+        nonDefaultStateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(getEnteredNumber());
+                        SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = adHocRailwayApplication.getSrcpTurnoutControlAdapter();
+                        srcpTurnoutControlAdapter.setNonDefaultState(turnoutByNumber);
+                        resetNumbers();
+                        return null;
+                    }
+                };
+                asyncTask.execute();
+            }
+        });
     }
 
 
@@ -86,6 +123,10 @@ public class MainActivity extends Activity {
         currentNumber.setText("---");
     }
 
+    private int getEnteredNumber() {
+        return Integer.parseInt(enteredNumberKeys.toString());
+    }
+
     private class NumberButtonClickListener implements View.OnClickListener {
         private int number;
 
@@ -96,7 +137,7 @@ public class MainActivity extends Activity {
         @Override
         public void onClick(View v) {
             enteredNumberKeys.append(number);
-            final int currentEnteredNumber = Integer.parseInt(enteredNumberKeys.toString());
+            final int currentEnteredNumber = getEnteredNumber();
             Log.i(MainActivity.class.getSimpleName(), "current entered number: " + currentEnteredNumber);
             if (currentEnteredNumber > 999) {
                 resetNumbers();
@@ -104,7 +145,6 @@ public class MainActivity extends Activity {
             }
             currentNumber.setText("" + currentEnteredNumber);
         }
-
     }
 
     private class Locomotive1SpeedListener implements SeekBar.OnSeekBarChangeListener {

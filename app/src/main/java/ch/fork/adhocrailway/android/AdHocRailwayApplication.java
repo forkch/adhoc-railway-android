@@ -4,15 +4,22 @@ import android.app.Application;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.google.common.eventbus.EventBus;
+
 import java.util.SortedSet;
 import java.util.UUID;
 
+import ch.fork.AdHocRailway.manager.TurnoutManager;
+import ch.fork.AdHocRailway.manager.TurnoutManagerListener;
+import ch.fork.AdHocRailway.manager.impl.TurnoutManagerImpl;
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
+import ch.fork.AdHocRailway.model.turnouts.TurnoutGroup;
 import ch.fork.AdHocRailway.model.turnouts.TurnoutState;
 import ch.fork.AdHocRailway.model.turnouts.TurnoutType;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestLocomotiveService;
+import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestTurnoutService;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.socketio.SIOService;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.socketio.ServiceListener;
 import ch.fork.AdHocRailway.railway.srcp.SRCPLocomotiveControlAdapter;
@@ -25,12 +32,14 @@ import de.dermoba.srcp.common.exception.SRCPException;
 /**
  * Created by fork on 4/16/14.
  */
-public class AdHocRailwayApplication extends Application implements LocomotiveServiceListener, ServiceListener {
+public class AdHocRailwayApplication extends Application implements LocomotiveServiceListener, ServiceListener, TurnoutManagerListener {
     private SortedSet<LocomotiveGroup> locomotiveGroups;
     private Locomotive selectedLocomotive;
 
     private SRCPLocomotiveControlAdapter srcpLocomotiveControlAdapter;
     private SRCPTurnoutControlAdapter srcpTurnoutControlAdapter;
+
+    private TurnoutManager turnoutManager;
 
     @Override
     public void onCreate() {
@@ -91,8 +100,13 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         AsyncTask<Void, Void, Void> rest = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
+                turnoutManager = new TurnoutManagerImpl();
+                turnoutManager.addTurnoutManagerListener(AdHocRailwayApplication.this);
+
                 RestLocomotiveService restLocomotiveService = new RestLocomotiveService("http://10.0.2.2:3000", UUID.randomUUID().toString());
-                restLocomotiveService.init(AdHocRailwayApplication.this);
+                RestTurnoutService restTurnoutService = new RestTurnoutService("http://10.0.2.2:3000", UUID.randomUUID().toString());
+                turnoutManager.setTurnoutService(restTurnoutService);
+                turnoutManager.initialize(new EventBus());
                 SIOService.getInstance().connect("http://10.0.2.2:3000", AdHocRailwayApplication.this);
                 return null;
             }
@@ -102,17 +116,15 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     }
 
     public SRCPTurnoutControlAdapter getSrcpTurnoutControlAdapter() {
-        if (srcpTurnoutControlAdapter == null) {
-            connectToSrcpd();
-        }
         return srcpTurnoutControlAdapter;
     }
 
     public SRCPLocomotiveControlAdapter getSrcpLocomotiveControlAdapter() {
-        if (srcpLocomotiveControlAdapter == null) {
-            connectToSrcpd();
-        }
         return srcpLocomotiveControlAdapter;
+    }
+
+    public TurnoutManager getTurnoutManager() {
+        return turnoutManager;
     }
 
     @Override
@@ -155,6 +167,41 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     public void locomotivesUpdated(SortedSet<LocomotiveGroup> locomotiveGroups) {
         Log.d("", String.valueOf(locomotiveGroups));
         setLocomotiveGroups(locomotiveGroups);
+    }
+
+    @Override
+    public void turnoutsUpdated(SortedSet<TurnoutGroup> turnoutGroups) {
+
+    }
+
+    @Override
+    public void turnoutAdded(Turnout turnout) {
+
+    }
+
+    @Override
+    public void turnoutUpdated(Turnout turnout) {
+
+    }
+
+    @Override
+    public void turnoutRemoved(Turnout turnout) {
+
+    }
+
+    @Override
+    public void turnoutGroupAdded(TurnoutGroup group) {
+
+    }
+
+    @Override
+    public void turnoutGroupUpdated(TurnoutGroup group) {
+
+    }
+
+    @Override
+    public void turnoutGroupRemoved(TurnoutGroup group) {
+
     }
 
     @Override
