@@ -2,50 +2,78 @@ package ch.fork.adhocrailway.android;
 
 import android.app.Application;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 
-import com.google.common.eventbus.EventBus;
+import com.squareup.otto.Bus;
 
 import java.util.SortedSet;
 import java.util.UUID;
 
+import ch.fork.AdHocRailway.manager.LocomotiveManager;
+import ch.fork.AdHocRailway.manager.LocomotiveManagerListener;
+import ch.fork.AdHocRailway.manager.RouteManager;
+import ch.fork.AdHocRailway.manager.RouteManagerListener;
 import ch.fork.AdHocRailway.manager.TurnoutManager;
 import ch.fork.AdHocRailway.manager.TurnoutManagerListener;
+import ch.fork.AdHocRailway.manager.impl.LocomotiveManagerImpl;
+import ch.fork.AdHocRailway.manager.impl.RouteManagerImpl;
 import ch.fork.AdHocRailway.manager.impl.TurnoutManagerImpl;
+import ch.fork.AdHocRailway.manager.impl.events.LocomotivesUpdatedEvent;
+import ch.fork.AdHocRailway.manager.impl.events.RoutesUpdatedEvent;
+import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
+import ch.fork.AdHocRailway.model.turnouts.Route;
+import ch.fork.AdHocRailway.model.turnouts.RouteGroup;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
 import ch.fork.AdHocRailway.model.turnouts.TurnoutGroup;
-import ch.fork.AdHocRailway.model.turnouts.TurnoutState;
-import ch.fork.AdHocRailway.model.turnouts.TurnoutType;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestLocomotiveService;
+import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestRouteService;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestTurnoutService;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.socketio.SIOService;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.socketio.ServiceListener;
 import ch.fork.AdHocRailway.railway.srcp.SRCPLocomotiveControlAdapter;
+import ch.fork.AdHocRailway.railway.srcp.SRCPRouteControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 import ch.fork.AdHocRailway.services.AdHocServiceException;
 import ch.fork.AdHocRailway.services.LocomotiveServiceListener;
 import de.dermoba.srcp.client.SRCPSession;
 import de.dermoba.srcp.common.exception.SRCPException;
+import timber.log.Timber;
 
 /**
  * Created by fork on 4/16/14.
  */
-public class AdHocRailwayApplication extends Application implements LocomotiveServiceListener, ServiceListener, TurnoutManagerListener {
+public class AdHocRailwayApplication extends Application implements LocomotiveServiceListener, ServiceListener, TurnoutManagerListener, RouteManagerListener, LocomotiveManagerListener {
+    //private static final String SERVER_HOST = "adhocserver";
+    private static final String SERVER_HOST = "10.0.2.2";
     private SortedSet<LocomotiveGroup> locomotiveGroups;
     private Locomotive selectedLocomotive;
 
     private SRCPLocomotiveControlAdapter srcpLocomotiveControlAdapter;
     private SRCPTurnoutControlAdapter srcpTurnoutControlAdapter;
+    private SRCPRouteControlAdapter srcpRouteControlAdapter;
 
     private TurnoutManager turnoutManager;
+    private RouteManager routeManager;
+    private LocomotiveManager locomotiveManager;
+
+    private Bus bus;
+    private Handler handler;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        connectToAdHocServer();
-        connectToSrcpd();
+        bus = new Bus();
+        bus.register(this);
+        handler = new Handler();
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        } else {
+            Timber.plant(new CrashReportingTree());
+        }
     }
 
     public SortedSet<LocomotiveGroup> getLocomotiveGroups() {
@@ -64,28 +92,23 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         this.selectedLocomotive = selectedLocomotive;
     }
 
-    private void connectToSrcpd() {
+    public void connectToSrcpd() {
         AsyncTask<Void, Void, Void> switchTurnout = new AsyncTask<Void, Void, Void>() {
 
 
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    SRCPSession session = new SRCPSession("10.0.2.2", 4303);
+                    SRCPSession session = new SRCPSession(SERVER_HOST, 4303);
                     session.connect();
 
-
                     srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter();
+                    srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter);
                     srcpLocomotiveControlAdapter = new SRCPLocomotiveControlAdapter();
-                    srcpTurnoutControlAdapter.setSession(session);
-                    srcpLocomotiveControlAdapter.setSession(session);
-                    Turnout turnout = new Turnout();
-                    turnout.setBus1(1);
-                    turnout.setAddress1(1);
-                    turnout.setDefaultState(TurnoutState.STRAIGHT);
-                    turnout.setType(TurnoutType.DEFAULT_LEFT);
 
-                    srcpTurnoutControlAdapter.setCurvedLeft(turnout);
+                    srcpTurnoutControlAdapter.setSession(session);
+                    srcpRouteControlAdapter.setSession(session);
+                    srcpLocomotiveControlAdapter.setSession(session);
                 } catch (SRCPException e) {
                     e.printStackTrace();
                 }
@@ -96,18 +119,29 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         switchTurnout.execute();
     }
 
-    private void connectToAdHocServer() {
+    public void connectToAdHocServer() {
         AsyncTask<Void, Void, Void> rest = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 turnoutManager = new TurnoutManagerImpl();
                 turnoutManager.addTurnoutManagerListener(AdHocRailwayApplication.this);
-
-                RestLocomotiveService restLocomotiveService = new RestLocomotiveService("http://10.0.2.2:3000", UUID.randomUUID().toString());
-                RestTurnoutService restTurnoutService = new RestTurnoutService("http://10.0.2.2:3000", UUID.randomUUID().toString());
+                RestTurnoutService restTurnoutService = new RestTurnoutService("http://" + SERVER_HOST + ":3000", UUID.randomUUID().toString());
                 turnoutManager.setTurnoutService(restTurnoutService);
-                turnoutManager.initialize(new EventBus());
-                SIOService.getInstance().connect("http://10.0.2.2:3000", AdHocRailwayApplication.this);
+                turnoutManager.initialize();
+
+                routeManager = new RouteManagerImpl(turnoutManager);
+                routeManager.addRouteManagerListener(AdHocRailwayApplication.this);
+                RestRouteService restRouteService = new RestRouteService("http://" + SERVER_HOST + ":3000", UUID.randomUUID().toString());
+                routeManager.setRouteService(restRouteService);
+                routeManager.initialize();
+
+                locomotiveManager = new LocomotiveManagerImpl();
+                locomotiveManager.addLocomotiveManagerListener(AdHocRailwayApplication.this);
+                RestLocomotiveService restLocomotiveService = new RestLocomotiveService("http://" + SERVER_HOST + ":3000", UUID.randomUUID().toString());
+                locomotiveManager.setLocomotiveService(restLocomotiveService);
+                locomotiveManager.initialize();
+
+                SIOService.getInstance().connect("http://" + SERVER_HOST + ":3000", AdHocRailwayApplication.this);
                 return null;
             }
         };
@@ -119,6 +153,10 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         return srcpTurnoutControlAdapter;
     }
 
+    public SRCPRouteControlAdapter getSrcpRouteControlAdapter() {
+        return srcpRouteControlAdapter;
+    }
+
     public SRCPLocomotiveControlAdapter getSrcpLocomotiveControlAdapter() {
         return srcpLocomotiveControlAdapter;
     }
@@ -127,51 +165,70 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         return turnoutManager;
     }
 
+    public RouteManager getRouteManager() {
+        return routeManager;
+    }
+
+    public LocomotiveManager getLocomotiveManager() {
+        return locomotiveManager;
+    }
+
     @Override
     public void locomotiveAdded(Locomotive locomotive) {
-
-        Log.d("", String.valueOf(locomotive));
+        Log.i("", String.valueOf(locomotive));
     }
 
     @Override
     public void locomotiveUpdated(Locomotive locomotive) {
-
-        Log.d("", String.valueOf(locomotive));
+        Log.i("", String.valueOf(locomotive));
     }
 
     @Override
     public void locomotiveRemoved(Locomotive locomotive) {
 
-        Log.d("", String.valueOf(locomotive));
+        Log.i("", String.valueOf(locomotive));
     }
 
     @Override
     public void locomotiveGroupAdded(LocomotiveGroup group) {
 
-        Log.d("", String.valueOf(group));
+        Log.i("", String.valueOf(group));
     }
 
     @Override
     public void locomotiveGroupUpdated(LocomotiveGroup group) {
 
-        Log.d("", String.valueOf(group));
+        Log.i("", String.valueOf(group));
     }
 
     @Override
     public void locomotiveGroupRemoved(LocomotiveGroup group) {
 
-        Log.d("", String.valueOf(group));
+        Log.i("", String.valueOf(group));
     }
 
     @Override
-    public void locomotivesUpdated(SortedSet<LocomotiveGroup> locomotiveGroups) {
-        Log.d("", String.valueOf(locomotiveGroups));
+    public void locomotivesUpdated(final SortedSet<LocomotiveGroup> locomotiveGroups) {
+        Log.i("", String.valueOf(locomotiveGroups));
         setLocomotiveGroups(locomotiveGroups);
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                bus.post(new LocomotivesUpdatedEvent(locomotiveGroups));
+
+            }
+        });
     }
 
     @Override
-    public void turnoutsUpdated(SortedSet<TurnoutGroup> turnoutGroups) {
+    public void turnoutsUpdated(final SortedSet<TurnoutGroup> turnoutGroups) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                bus.post(new TurnoutsUpdatedEvent(turnoutGroups));
 
+            }
+        });
     }
 
     @Override
@@ -205,13 +262,54 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     }
 
     @Override
+    public void routesUpdated(final SortedSet<RouteGroup> allRouteGroups) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                bus.post(new RoutesUpdatedEvent(allRouteGroups));
+
+            }
+        });
+    }
+
+    @Override
+    public void routeRemoved(Route route) {
+
+    }
+
+    @Override
+    public void routeAdded(Route route) {
+
+    }
+
+    @Override
+    public void routeUpdated(Route route) {
+
+    }
+
+    @Override
+    public void routeGroupAdded(RouteGroup routeGroup) {
+
+    }
+
+    @Override
+    public void routeGroupRemoved(RouteGroup routeGroup) {
+
+    }
+
+    @Override
+    public void routeGroupUpdated(RouteGroup routeGroup) {
+
+    }
+
+    @Override
     public void failure(AdHocServiceException arg0) {
         Log.e("", "error");
     }
 
     @Override
     public void connected() {
-        Log.d("", "connected");
+        Log.i("", "connected");
     }
 
     @Override
@@ -223,6 +321,35 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     @Override
     public void disconnected() {
 
-        Log.d("", "disconnected");
+        Log.i("", "disconnected");
+    }
+
+    public Bus getBus() {
+        return bus;
+    }
+
+    /**
+     * A tree which logs important information for crash reporting.
+     */
+    private static class CrashReportingTree extends Timber.HollowTree {
+        @Override
+        public void i(String message, Object... args) {
+            // TODO e.g., Crashlytics.log(String.format(message, args));
+        }
+
+        @Override
+        public void i(Throwable t, String message, Object... args) {
+            i(message, args); // Just add to the log.
+        }
+
+        @Override
+        public void e(String message, Object... args) {
+            i("ERROR: " + message, args); // Just add to the log.
+        }
+
+        @Override
+        public void e(Throwable t, String message, Object... args) {
+            e(message, args);
+        }
     }
 }

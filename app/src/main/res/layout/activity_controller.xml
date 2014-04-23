@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:focusableInTouchMode="false"
             android:gravity="center|top"
-            android:text="999"
+            android:text="---"
             android:textSize="40dp" />
 
         <GridLayout

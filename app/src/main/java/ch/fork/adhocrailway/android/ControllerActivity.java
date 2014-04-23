@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -17,7 +19,7 @@ import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
 import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 
-public class MainActivity extends Activity {
+public class ControllerActivity extends Activity {
 
     private AdHocRailwayApplication adHocRailwayApplication;
 
@@ -27,7 +29,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_controller);
 
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
 
@@ -61,6 +63,10 @@ public class MainActivity extends Activity {
                     @Override
                     protected Void doInBackground(Void... params) {
                         Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(getEnteredNumber());
+                        if (turnoutByNumber == null) {
+                            resetNumbers();
+                            return null;
+                        }
                         SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = adHocRailwayApplication.getSrcpTurnoutControlAdapter();
                         srcpTurnoutControlAdapter.setDefaultState(turnoutByNumber);
                         resetNumbers();
@@ -79,6 +85,10 @@ public class MainActivity extends Activity {
                     @Override
                     protected Void doInBackground(Void... params) {
                         Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(getEnteredNumber());
+                        if (turnoutByNumber == null) {
+                            resetNumbers();
+                            return null;
+                        }
                         SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = adHocRailwayApplication.getSrcpTurnoutControlAdapter();
                         srcpTurnoutControlAdapter.setNonDefaultState(turnoutByNumber);
                         resetNumbers();
@@ -113,14 +123,38 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.connect, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void onSelectLocomotiveClick(View view) {
         Intent selectLocomotiveIntent = new Intent(this, LocomotiveSelectActivity.class);
         startActivity(selectLocomotiveIntent);
     }
 
     private void resetNumbers() {
-        enteredNumberKeys = new StringBuffer();
-        currentNumber.setText("---");
+        currentNumber.post(new Runnable() {
+            @Override
+            public void run() {
+                enteredNumberKeys = new StringBuffer();
+                currentNumber.setText("---");
+            }
+        });
     }
 
     private int getEnteredNumber() {
@@ -138,7 +172,7 @@ public class MainActivity extends Activity {
         public void onClick(View v) {
             enteredNumberKeys.append(number);
             final int currentEnteredNumber = getEnteredNumber();
-            Log.i(MainActivity.class.getSimpleName(), "current entered number: " + currentEnteredNumber);
+            Log.i(ControllerActivity.class.getSimpleName(), "current entered number: " + currentEnteredNumber);
             if (currentEnteredNumber > 999) {
                 resetNumbers();
                 return;

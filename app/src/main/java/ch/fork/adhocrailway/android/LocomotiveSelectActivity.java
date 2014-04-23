@@ -11,6 +11,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
@@ -19,6 +20,7 @@ import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
 public class LocomotiveSelectActivity extends ListActivity {
 
     private List<Locomotive> locomotives;
+    private SortedSet<Locomotive> sortedLocomotives;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,14 +30,15 @@ public class LocomotiveSelectActivity extends ListActivity {
         ListView listView = getListView();
 
         final AdHocRailwayApplication adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
-        locomotives = new ArrayList<Locomotive>();
+        sortedLocomotives = new TreeSet<Locomotive>();
 
         SortedSet<LocomotiveGroup> locomotiveGroups = adHocRailwayApplication.getLocomotiveGroups();
         if (locomotiveGroups != null) {
             for (LocomotiveGroup locomotiveGroup : locomotiveGroups) {
-                locomotives.addAll(locomotiveGroup.getLocomotives());
+                sortedLocomotives.addAll(locomotiveGroup.getLocomotives());
             }
         }
+        locomotives = new ArrayList<Locomotive>(sortedLocomotives);
 
         LocomotiveListAdapter locomotiveListAdapter = new LocomotiveListAdapter(this, locomotives);
 
