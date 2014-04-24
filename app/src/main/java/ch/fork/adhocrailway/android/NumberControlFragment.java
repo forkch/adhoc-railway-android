@@ -18,12 +18,12 @@ import ch.fork.AdHocRailway.model.turnouts.Turnout;
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link NumberControl.OnFragmentInteractionListener} interface
+ * {@link NumberControlFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link NumberControl#newInstance} factory method to
+ * Use the {@link NumberControlFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NumberControl extends Fragment {
+public class NumberControlFragment extends Fragment {
 
     private StringBuffer enteredNumberKeys = new StringBuffer();
     private TextView currentNumber;
@@ -32,7 +32,7 @@ public class NumberControl extends Fragment {
     private AdHocRailwayApplication adHocRailwayApplication;
     private View fragmentView;
 
-    public NumberControl() {
+    public NumberControlFragment() {
         // Required empty public constructor
     }
 
@@ -40,11 +40,11 @@ public class NumberControl extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment NumberControl.
+     * @return A new instance of fragment NumberControlFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static NumberControl newInstance() {
-        NumberControl fragment = new NumberControl();
+    public static NumberControlFragment newInstance() {
+        NumberControlFragment fragment = new NumberControlFragment();
         return fragment;
     }
 
@@ -86,49 +86,19 @@ public class NumberControl extends Fragment {
         }
 
         Button defaultStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonDefault);
-        defaultStateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+        defaultStateButton.setOnClickListener(new DefaultStateHandler());
 
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(getEnteredNumber());
-                        if (turnoutByNumber == null) {
-                            resetNumbers();
-                            return null;
-                        }
-                        TurnoutController srcpTurnoutControlAdapter = adHocRailwayApplication.getTurnoutController();
-                        srcpTurnoutControlAdapter.setDefaultState(turnoutByNumber);
-                        resetNumbers();
-                        return null;
-                    }
-                };
-                asyncTask.execute();
-            }
-        });
         Button nonDefaultStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonNonDefault);
-        nonDefaultStateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+        nonDefaultStateButton.setOnClickListener(new NonDefaultStateHandler());
 
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(getEnteredNumber());
-                        if (turnoutByNumber == null) {
-                            resetNumbers();
-                            return null;
-                        }
-                        TurnoutController srcpTurnoutControlAdapter = adHocRailwayApplication.getTurnoutController();
-                        srcpTurnoutControlAdapter.setNonDefaultState(turnoutByNumber);
-                        resetNumbers();
-                        return null;
-                    }
-                };
-                asyncTask.execute();
-            }
-        });
+        Button leftStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonLeft);
+        nonDefaultStateButton.setOnClickListener(new LefttStateHandler());
+
+        Button straightStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonStraight);
+        nonDefaultStateButton.setOnClickListener(new StraightStateHandler());
+
+        Button rightStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonRight);
+        nonDefaultStateButton.setOnClickListener(new RightStateHandler());
 
     }
 
@@ -186,4 +156,73 @@ public class NumberControl extends Fragment {
         }
     }
 
+    private abstract class TurnoutStateHandler implements View.OnClickListener {
+
+        protected abstract void doPerformStateAction(TurnoutController srcpTurnoutControlAdapter, Turnout turnout);
+
+        @Override
+        public void onClick(View v) {
+            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(getEnteredNumber());
+                    if (turnoutByNumber == null) {
+                        resetNumbers();
+                        return null;
+                    }
+                    TurnoutController turnoutController = adHocRailwayApplication.getTurnoutController();
+                    doPerformStateAction(turnoutController, turnoutByNumber);
+                    resetNumbers();
+                    return null;
+                }
+            };
+            asyncTask.execute();
+        }
+    }
+
+    private class DefaultStateHandler extends TurnoutStateHandler {
+
+        @Override
+        protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
+
+            turnoutController.setDefaultState(turnout);
+        }
+    }
+
+    private class NonDefaultStateHandler extends TurnoutStateHandler {
+
+        @Override
+        protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
+
+            turnoutController.setNonDefaultState(turnout);
+        }
+    }
+
+    private class LefttStateHandler extends TurnoutStateHandler {
+
+        @Override
+        protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
+
+            turnoutController.setCurvedLeft(turnout);
+        }
+    }
+
+    private class StraightStateHandler extends TurnoutStateHandler {
+
+        @Override
+        protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
+
+            turnoutController.setStraight(turnout);
+        }
+    }
+
+    private class RightStateHandler extends TurnoutStateHandler {
+
+        @Override
+        protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
+
+            turnoutController.setCurvedRight(turnout);
+        }
+    }
 }
