@@ -1,0 +1,135 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/numberControlFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ch.fork.adhocrailway.android.NumberControl">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/currentNumber"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false"
+            android:gravity="center|top"
+            android:text="---"
+            android:textSize="40dp" />
+
+        <GridLayout
+            android:id="@+id/turnoutGrid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="3">
+
+            <Button
+                android:id="@+id/turnoutButtonLeft"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="&lt;" />
+
+            <Button
+                android:id="@+id/turnoutButtonStraight"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="^" />
+
+            <Button
+                android:id="@+id/turnoutButtonRight"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="&gt;" />
+
+            <Button
+                android:id="@+id/turnoutButton7"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="7" />
+
+            <Button
+                android:id="@+id/turnoutButton8"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="8" />
+
+            <Button
+                android:id="@+id/turnoutButton9"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="9" />
+
+            <Button
+                android:id="@+id/turnoutButton4"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="4" />
+
+            <Button
+                android:id="@+id/turnoutButton5"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="5" />
+
+            <Button
+                android:id="@+id/turnoutButton6"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="6" />
+
+            <Button
+                android:id="@+id/turnoutButton1"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="1" />
+
+            <Button
+                android:id="@+id/turnoutButton2"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="2" />
+
+            <Button
+                android:id="@+id/turnoutButton3"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="3" />
+
+            <Button
+                android:id="@+id/turnoutButton0"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="0" />
+
+            <Button
+                android:id="@+id/turnoutButtonDot"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="@dimen/numberButtonHeight"
+                android:text="." />
+
+        </GridLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/turnoutButtonNonDefault"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/stateButtonHeight"
+
+                android:text="+" />
+
+            <Button
+                android:id="@+id/turnoutButtonDefault"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/stateButtonHeight"
+                android:text="Enter" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

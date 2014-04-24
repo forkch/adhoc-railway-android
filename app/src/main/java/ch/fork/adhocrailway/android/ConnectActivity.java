@@ -21,6 +21,7 @@ public class ConnectActivity extends Activity {
     private boolean locomotivesLoaded;
     private boolean routesLoaded;
     private boolean turnoutsLoaded;
+    private boolean connectedToRailwayDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class ConnectActivity extends Activity {
         connectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                adHocRailwayApplication.clearServers();
                 adHocRailwayApplication.connectToAdHocServer();
                 adHocRailwayApplication.connectToSrcpd();
             }
@@ -74,13 +76,19 @@ public class ConnectActivity extends Activity {
     }
 
     @Subscribe
+    public void connectedToRailwayDevice(ConnectedToRailwayDeviceEvent event) {
+        connectedToRailwayDevice = event.isConnected();
+        startMainActivityIfEverythingIsLoaded();
+    }
+
+    @Subscribe
     public void locomotivesUpdated(LocomotivesUpdatedEvent event) {
         locomotivesLoaded = true;
         startMainActivityIfEverythingIsLoaded();
     }
 
     private void startMainActivityIfEverythingIsLoaded() {
-        if (locomotivesLoaded && turnoutsLoaded && routesLoaded) {
+        if (connectedToRailwayDevice && locomotivesLoaded && turnoutsLoaded && routesLoaded) {
             startActivity(new Intent(this, ControllerActivity.class));
         }
     }

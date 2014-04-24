@@ -1,10 +1,11 @@
 package ch.fork.adhocrailway.android;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,15 +17,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
-import ch.fork.AdHocRailway.model.turnouts.Turnout;
-import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 
-public class ControllerActivity extends Activity {
+public class ControllerActivity extends FragmentActivity implements NumberControl.OnFragmentInteractionListener {
 
     private AdHocRailwayApplication adHocRailwayApplication;
 
-    private StringBuffer enteredNumberKeys = new StringBuffer();
-    private TextView currentNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +30,16 @@ public class ControllerActivity extends Activity {
 
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
 
-        currentNumber = (TextView) findViewById(R.id.currentNumber);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.numberControlFragment);
+        frameLayout.removeAllViews();
+
+        NumberControl numberControl = NumberControl.newInstance();
+        fragmentTransaction.add(R.id.numberControlContainer, numberControl);
+        fragmentTransaction.commit();
 
         initEventHandling();
-
     }
 
     private void initEventHandling() {
@@ -49,55 +52,6 @@ public class ControllerActivity extends Activity {
         Button stopButton = (Button) findViewById(R.id.locomotive1Stop);
         stopButton.setOnClickListener(new Locomotive1StopListener());
 
-        for (int i = 0; i < 10; i++) {
-            Button turnoutButton = (Button) findViewById(getResources().getIdentifier("turnoutButton" + i, "id", getPackageName()));
-            turnoutButton.setOnClickListener(new NumberButtonClickListener(i));
-        }
-
-        Button defaultStateButton = (Button) findViewById(R.id.turnoutButtonDefault);
-        defaultStateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(getEnteredNumber());
-                        if (turnoutByNumber == null) {
-                            resetNumbers();
-                            return null;
-                        }
-                        SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = adHocRailwayApplication.getSrcpTurnoutControlAdapter();
-                        srcpTurnoutControlAdapter.setDefaultState(turnoutByNumber);
-                        resetNumbers();
-                        return null;
-                    }
-                };
-                asyncTask.execute();
-            }
-        });
-        Button nonDefaultStateButton = (Button) findViewById(R.id.turnoutButtonNonDefault);
-        nonDefaultStateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(getEnteredNumber());
-                        if (turnoutByNumber == null) {
-                            resetNumbers();
-                            return null;
-                        }
-                        SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = adHocRailwayApplication.getSrcpTurnoutControlAdapter();
-                        srcpTurnoutControlAdapter.setNonDefaultState(turnoutByNumber);
-                        resetNumbers();
-                        return null;
-                    }
-                };
-                asyncTask.execute();
-            }
-        });
     }
 
 
@@ -147,39 +101,6 @@ public class ControllerActivity extends Activity {
         startActivity(selectLocomotiveIntent);
     }
 
-    private void resetNumbers() {
-        currentNumber.post(new Runnable() {
-            @Override
-            public void run() {
-                enteredNumberKeys = new StringBuffer();
-                currentNumber.setText("---");
-            }
-        });
-    }
-
-    private int getEnteredNumber() {
-        return Integer.parseInt(enteredNumberKeys.toString());
-    }
-
-    private class NumberButtonClickListener implements View.OnClickListener {
-        private int number;
-
-        public NumberButtonClickListener(int number) {
-            this.number = number;
-        }
-
-        @Override
-        public void onClick(View v) {
-            enteredNumberKeys.append(number);
-            final int currentEnteredNumber = getEnteredNumber();
-            Log.i(ControllerActivity.class.getSimpleName(), "current entered number: " + currentEnteredNumber);
-            if (currentEnteredNumber > 999) {
-                resetNumbers();
-                return;
-            }
-            currentNumber.setText("" + currentEnteredNumber);
-        }
-    }
 
     private class Locomotive1SpeedListener implements SeekBar.OnSeekBarChangeListener {
         @Override

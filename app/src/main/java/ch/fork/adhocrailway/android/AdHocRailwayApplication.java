@@ -61,6 +61,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     private Bus bus;
     private Handler handler;
+    private SRCPSession session;
 
     @Override
     public void onCreate() {
@@ -99,7 +100,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    SRCPSession session = new SRCPSession(SERVER_HOST, 4303);
+                    session = new SRCPSession(SERVER_HOST, 4303);
                     session.connect();
 
                     srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter();
@@ -109,8 +110,20 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
                     srcpTurnoutControlAdapter.setSession(session);
                     srcpRouteControlAdapter.setSession(session);
                     srcpLocomotiveControlAdapter.setSession(session);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            bus.post(new ConnectedToRailwayDeviceEvent(true));
+                        }
+                    });
                 } catch (SRCPException e) {
-                    e.printStackTrace();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            bus.post(new ConnectedToRailwayDeviceEvent(false));
+
+                        }
+                    });
                 }
                 return null;
             }
@@ -171,6 +184,34 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     public LocomotiveManager getLocomotiveManager() {
         return locomotiveManager;
+    }
+
+
+    public Bus getBus() {
+        return bus;
+    }
+
+    public void clearServers() {
+        if (turnoutManager != null)
+            turnoutManager.disconnect();
+        if (routeManager != null)
+            routeManager.disconnect();
+        if (locomotiveManager != null)
+            locomotiveManager.disconnect();
+
+        if (srcpTurnoutControlAdapter != null)
+            srcpTurnoutControlAdapter.setSession(null);
+        if (srcpRouteControlAdapter != null)
+            srcpRouteControlAdapter.setSession(null);
+        if (srcpLocomotiveControlAdapter != null)
+            srcpLocomotiveControlAdapter.setSession(null);
+
+        try {
+            if (session != null)
+                session.disconnect();
+        } catch (SRCPException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -324,9 +365,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         Log.i("", "disconnected");
     }
 
-    public Bus getBus() {
-        return bus;
-    }
 
     /**
      * A tree which logs important information for crash reporting.
