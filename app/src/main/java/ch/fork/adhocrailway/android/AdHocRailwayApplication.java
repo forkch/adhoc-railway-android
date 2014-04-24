@@ -1,15 +1,24 @@
 package ch.fork.adhocrailway.android;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.squareup.otto.Bus;
 
+import java.io.InputStream;
 import java.util.SortedSet;
 import java.util.UUID;
 
+import ch.fork.AdHocRailway.controllers.LocomotiveController;
+import ch.fork.AdHocRailway.controllers.RouteController;
+import ch.fork.AdHocRailway.controllers.TurnoutController;
+import ch.fork.AdHocRailway.controllers.impl.dummy.DummyLocomotiveController;
+import ch.fork.AdHocRailway.controllers.impl.dummy.DummyRouteController;
+import ch.fork.AdHocRailway.controllers.impl.dummy.DummyTurnoutController;
 import ch.fork.AdHocRailway.manager.LocomotiveManager;
 import ch.fork.AdHocRailway.manager.LocomotiveManagerListener;
 import ch.fork.AdHocRailway.manager.RouteManager;
@@ -33,6 +42,10 @@ import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestRouteService;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestTurnoutService;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.socketio.SIOService;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.socketio.ServiceListener;
+import ch.fork.AdHocRailway.persistence.xml.XMLServiceHelper;
+import ch.fork.AdHocRailway.persistence.xml.impl.XMLLocomotiveService;
+import ch.fork.AdHocRailway.persistence.xml.impl.XMLRouteService;
+import ch.fork.AdHocRailway.persistence.xml.impl.XMLTurnoutService;
 import ch.fork.AdHocRailway.railway.srcp.SRCPLocomotiveControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPRouteControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
@@ -47,13 +60,13 @@ import timber.log.Timber;
  */
 public class AdHocRailwayApplication extends Application implements LocomotiveServiceListener, ServiceListener, TurnoutManagerListener, RouteManagerListener, LocomotiveManagerListener {
     //private static final String SERVER_HOST = "adhocserver";
-    private static final String SERVER_HOST = "10.0.2.2";
+    public static final String SERVER_HOST = "10.0.2.2";
     private SortedSet<LocomotiveGroup> locomotiveGroups;
     private Locomotive selectedLocomotive;
 
-    private SRCPLocomotiveControlAdapter srcpLocomotiveControlAdapter;
-    private SRCPTurnoutControlAdapter srcpTurnoutControlAdapter;
-    private SRCPRouteControlAdapter srcpRouteControlAdapter;
+    private LocomotiveController locomotiveController;
+    private TurnoutController turnoutController;
+    private RouteController routeController;
 
     private TurnoutManager turnoutManager;
     private RouteManager routeManager;
@@ -62,6 +75,8 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     private Bus bus;
     private Handler handler;
     private SRCPSession session;
+    private String adhocServerHost;
+    private String srcpServerHost;
 
     @Override
     public void onCreate() {
@@ -93,23 +108,55 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         this.selectedLocomotive = selectedLocomotive;
     }
 
-    public void connectToSrcpd() {
+    public void connectToRailwayDevice() {
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean useDummyServices = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
+        if (useDummyServices) {
+            connectToDummySrcpService();
+        } else {
+            connectToSrcpd();
+        }
+    }
+
+    private void connectToDummySrcpService() {
+        turnoutController = new DummyTurnoutController();
+        routeController = new DummyRouteController(turnoutController);
+        locomotiveController = new DummyLocomotiveController();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                bus.post(new ConnectedToRailwayDeviceEvent(true));
+            }
+        });
+    }
+
+    private void connectToSrcpd() {
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        srcpServerHost = sharedPref.getString(SettingsActivity.KEY_SRCP_SERVER_HOST, SERVER_HOST);
+
         AsyncTask<Void, Void, Void> switchTurnout = new AsyncTask<Void, Void, Void>() {
 
 
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    session = new SRCPSession(SERVER_HOST, 4303);
+                    session = new SRCPSession(srcpServerHost, 4303);
                     session.connect();
 
-                    srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter();
-                    srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter);
-                    srcpLocomotiveControlAdapter = new SRCPLocomotiveControlAdapter();
+                    SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter();
+                    SRCPRouteControlAdapter srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter);
+                    SRCPLocomotiveControlAdapter srcpLocomotiveControlAdapter = new SRCPLocomotiveControlAdapter();
 
                     srcpTurnoutControlAdapter.setSession(session);
                     srcpRouteControlAdapter.setSession(session);
                     srcpLocomotiveControlAdapter.setSession(session);
+
+                    locomotiveController = srcpLocomotiveControlAdapter;
+                    turnoutController = srcpTurnoutControlAdapter;
+                    routeController = srcpRouteControlAdapter;
+
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -132,29 +179,73 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         switchTurnout.execute();
     }
 
-    public void connectToAdHocServer() {
+    public void connectToPersistence() {
+        turnoutManager = new TurnoutManagerImpl();
+        turnoutManager.addTurnoutManagerListener(AdHocRailwayApplication.this);
+        routeManager = new RouteManagerImpl(turnoutManager);
+        routeManager.addRouteManagerListener(AdHocRailwayApplication.this);
+        locomotiveManager = new LocomotiveManagerImpl();
+        locomotiveManager.addLocomotiveManagerListener(AdHocRailwayApplication.this);
+
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean useDummyServices = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
+        if (useDummyServices) {
+            loadXml();
+        } else {
+            connectToAdHocServer();
+        }
+
+    }
+
+    private void loadXml() {
+        final XMLLocomotiveService xmlLocomotiveService = new XMLLocomotiveService();
+        final XMLTurnoutService xmlTurnoutService = new XMLTurnoutService();
+        final XMLRouteService xmlRouteService = new XMLRouteService();
+        final XMLServiceHelper xmlServiceHelper = new XMLServiceHelper();
+
+        locomotiveManager.setLocomotiveService(xmlLocomotiveService);
+        turnoutManager.setTurnoutService(xmlTurnoutService);
+        routeManager.setRouteService(xmlRouteService);
+
+        locomotiveManager.initialize();
+        turnoutManager.initialize();
+        routeManager.initialize();
+
+        AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                InputStream inputStream = getApplicationContext().getResources().openRawResource(R.raw.weekend_2014);
+                Log.i("", inputStream.toString());
+                xmlServiceHelper.loadFile(xmlLocomotiveService, xmlTurnoutService, xmlRouteService, inputStream);
+
+                return null;
+            }
+        };
+        asyncTask.execute();
+    }
+
+    private void connectToAdHocServer() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        adhocServerHost = sharedPref.getString(SettingsActivity.KEY_ADHOC_SERVER_HOST, SERVER_HOST);
         AsyncTask<Void, Void, Void> rest = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                turnoutManager = new TurnoutManagerImpl();
-                turnoutManager.addTurnoutManagerListener(AdHocRailwayApplication.this);
-                RestTurnoutService restTurnoutService = new RestTurnoutService("http://" + SERVER_HOST + ":3000", UUID.randomUUID().toString());
+                String url = "http://" + adhocServerHost + ":3000";
+                RestTurnoutService restTurnoutService = new RestTurnoutService(url, UUID.randomUUID().toString());
                 turnoutManager.setTurnoutService(restTurnoutService);
                 turnoutManager.initialize();
 
-                routeManager = new RouteManagerImpl(turnoutManager);
-                routeManager.addRouteManagerListener(AdHocRailwayApplication.this);
-                RestRouteService restRouteService = new RestRouteService("http://" + SERVER_HOST + ":3000", UUID.randomUUID().toString());
+                RestRouteService restRouteService = new RestRouteService(url, UUID.randomUUID().toString());
                 routeManager.setRouteService(restRouteService);
                 routeManager.initialize();
 
-                locomotiveManager = new LocomotiveManagerImpl();
-                locomotiveManager.addLocomotiveManagerListener(AdHocRailwayApplication.this);
-                RestLocomotiveService restLocomotiveService = new RestLocomotiveService("http://" + SERVER_HOST + ":3000", UUID.randomUUID().toString());
+                RestLocomotiveService restLocomotiveService = new RestLocomotiveService(url, UUID.randomUUID().toString());
                 locomotiveManager.setLocomotiveService(restLocomotiveService);
                 locomotiveManager.initialize();
 
-                SIOService.getInstance().connect("http://" + SERVER_HOST + ":3000", AdHocRailwayApplication.this);
+                SIOService.getInstance().connect(url, AdHocRailwayApplication.this);
                 return null;
             }
         };
@@ -162,16 +253,16 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         rest.execute();
     }
 
-    public SRCPTurnoutControlAdapter getSrcpTurnoutControlAdapter() {
-        return srcpTurnoutControlAdapter;
+    public TurnoutController getTurnoutController() {
+        return turnoutController;
     }
 
-    public SRCPRouteControlAdapter getSrcpRouteControlAdapter() {
-        return srcpRouteControlAdapter;
+    public RouteController getRouteController() {
+        return routeController;
     }
 
-    public SRCPLocomotiveControlAdapter getSrcpLocomotiveControlAdapter() {
-        return srcpLocomotiveControlAdapter;
+    public LocomotiveController getLocomotiveController() {
+        return locomotiveController;
     }
 
     public TurnoutManager getTurnoutManager() {
@@ -199,12 +290,9 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         if (locomotiveManager != null)
             locomotiveManager.disconnect();
 
-        if (srcpTurnoutControlAdapter != null)
-            srcpTurnoutControlAdapter.setSession(null);
-        if (srcpRouteControlAdapter != null)
-            srcpRouteControlAdapter.setSession(null);
-        if (srcpLocomotiveControlAdapter != null)
-            srcpLocomotiveControlAdapter.setSession(null);
+        turnoutController = null;
+        routeController = null;
+        locomotiveController = null;
 
         try {
             if (session != null)

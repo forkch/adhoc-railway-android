@@ -10,11 +10,18 @@
     tools:context="ch.fork.adhocrailway.android.ConnectActivity">
 
     <TextView
-        android:id="@+id/servernameTextField"
+        android:id="@+id/adhocServerHostTextView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="servername"
-        android:textSize="30dp" />
+        android:text="adHocServerHost"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/srcpServerHostTextView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="srcpServerHost"
+        android:textSize="20dp" />
 
     <Button
         android:id="@+id/connectButton"

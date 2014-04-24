@@ -13,15 +13,28 @@ dependencies {
     compile('ch.fork.adhocrailway:ch.fork.adhocrailway.persistence.adhocserver:2.+') {
         exclude group: 'xmlpull'
         exclude group: 'xpp3'
+        exclude group: 'org.apache.commons'
+        exclude group: 'commons-io'
+    }
+    compile('ch.fork.adhocrailway:ch.fork.adhocrailway.persistence.xml:2.+') {
+        exclude group: 'xmlpull'
+        exclude group: 'xpp3'
+        exclude group: 'org.apache.commons'
+        exclude group: 'commons-io'
+
     }
     compile('ch.fork.adhocrailway:ch.fork.adhocrailway.railway.srcp:2.+') {
         exclude group: 'xmlpull'
         exclude group: 'xpp3'
+        exclude group: 'org.apache.commons'
+        exclude group: 'commons-io'
     }
 
     compile 'com.squareup:otto:1.3.4'
     compile 'com.jakewharton:butterknife:5.0.0'
     compile 'com.jakewharton.timber:timber:2.2.+'
+    compile 'commons-io:commons-io:2.4'
+    compile 'org.apache.commons:commons-lang3:3.1'
 
 }
 
@@ -41,5 +54,9 @@ android {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
+    }
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
     }
 }

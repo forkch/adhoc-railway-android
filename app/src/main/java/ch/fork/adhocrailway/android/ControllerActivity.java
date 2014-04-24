@@ -22,7 +22,6 @@ public class ControllerActivity extends FragmentActivity implements NumberContro
 
     private AdHocRailwayApplication adHocRailwayApplication;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +31,7 @@ public class ControllerActivity extends FragmentActivity implements NumberContro
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.numberControlFragment);
+        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.numberControlContainer);
         frameLayout.removeAllViews();
 
         NumberControl numberControl = NumberControl.newInstance();
@@ -114,7 +113,7 @@ public class ControllerActivity extends FragmentActivity implements NumberContro
 
                 @Override
                 protected Void doInBackground(Void... params) {
-                    adHocRailwayApplication.getSrcpLocomotiveControlAdapter().setSpeed(selectedLocomotive, progress, selectedLocomotive.getCurrentFunctions());
+                    adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, progress, selectedLocomotive.getCurrentFunctions());
                     return null;
                 }
             };
@@ -142,7 +141,7 @@ public class ControllerActivity extends FragmentActivity implements NumberContro
 
                 @Override
                 protected Void doInBackground(Void... params) {
-                    adHocRailwayApplication.getSrcpLocomotiveControlAdapter().toggleDirection(selectedLocomotive);
+                    adHocRailwayApplication.getLocomotiveController().toggleDirection(selectedLocomotive);
                     return null;
                 }
             };
@@ -161,7 +160,7 @@ public class ControllerActivity extends FragmentActivity implements NumberContro
 
                 @Override
                 protected Void doInBackground(Void... params) {
-                    adHocRailwayApplication.getSrcpLocomotiveControlAdapter().setSpeed(selectedLocomotive, 0, selectedLocomotive.getCurrentFunctions());
+                    adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, 0, selectedLocomotive.getCurrentFunctions());
                     return null;
                 }
             };

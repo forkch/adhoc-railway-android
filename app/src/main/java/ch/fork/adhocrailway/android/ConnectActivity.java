@@ -2,11 +2,14 @@ package ch.fork.adhocrailway.android;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
@@ -30,6 +33,18 @@ public class ConnectActivity extends Activity {
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
         connectButton = (Button) findViewById(R.id.connectButton);
         initEventHandling();
+        initValues();
+    }
+
+    private void initValues() {
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String adhocServerHost = sharedPref.getString(SettingsActivity.KEY_ADHOC_SERVER_HOST, AdHocRailwayApplication.SERVER_HOST);
+        String srcpServerHost = sharedPref.getString(SettingsActivity.KEY_SRCP_SERVER_HOST, AdHocRailwayApplication.SERVER_HOST);
+        TextView adHocServerHostTextView = (TextView) findViewById(R.id.adhocServerHostTextView);
+        TextView srcpServerHostTextView = (TextView) findViewById(R.id.srcpServerHostTextView);
+        adHocServerHostTextView.setText(getString(R.string.adhocServerHostLabel) + adhocServerHost);
+        srcpServerHostTextView.setText(getString(R.string.srcpServerHostLabel) + srcpServerHost);
     }
 
     private void initEventHandling() {
@@ -37,8 +52,8 @@ public class ConnectActivity extends Activity {
             @Override
             public void onClick(View v) {
                 adHocRailwayApplication.clearServers();
-                adHocRailwayApplication.connectToAdHocServer();
-                adHocRailwayApplication.connectToSrcpd();
+                adHocRailwayApplication.connectToPersistence();
+                adHocRailwayApplication.connectToRailwayDevice();
             }
         });
     }
@@ -70,6 +85,7 @@ public class ConnectActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
-import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 
 
 /**
@@ -98,7 +98,7 @@ public class NumberControl extends Fragment {
                             resetNumbers();
                             return null;
                         }
-                        SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = adHocRailwayApplication.getSrcpTurnoutControlAdapter();
+                        TurnoutController srcpTurnoutControlAdapter = adHocRailwayApplication.getTurnoutController();
                         srcpTurnoutControlAdapter.setDefaultState(turnoutByNumber);
                         resetNumbers();
                         return null;
@@ -120,7 +120,7 @@ public class NumberControl extends Fragment {
                             resetNumbers();
                             return null;
                         }
-                        SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = adHocRailwayApplication.getSrcpTurnoutControlAdapter();
+                        TurnoutController srcpTurnoutControlAdapter = adHocRailwayApplication.getTurnoutController();
                         srcpTurnoutControlAdapter.setNonDefaultState(turnoutByNumber);
                         resetNumbers();
                         return null;
