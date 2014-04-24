@@ -27,13 +27,18 @@ public class ConnectActivity extends Activity {
     private boolean connectedToRailwayDevice;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        initValues();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
         connectButton = (Button) findViewById(R.id.connectButton);
         initEventHandling();
-        initValues();
     }
 
     private void initValues() {

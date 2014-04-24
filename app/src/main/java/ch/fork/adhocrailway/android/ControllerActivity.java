@@ -19,16 +19,18 @@ public class ControllerActivity extends FragmentActivity implements NumberContro
 
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         FrameLayout numberControlContainer = (FrameLayout) findViewById(R.id.numberControlContainer);
         numberControlContainer.removeAllViews();
 
         FrameLayout locomotiveControlContainer = (FrameLayout) findViewById(R.id.locomotiveControlContainer);
         locomotiveControlContainer.removeAllViews();
 
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
         NumberControlFragment numberControl = NumberControlFragment.newInstance();
         fragmentTransaction.add(R.id.numberControlContainer, numberControl);
+
         LocomotiveControlFragment locomotiveControlFragment = LocomotiveControlFragment.newInstance();
         fragmentTransaction.add(R.id.locomotiveControlContainer, locomotiveControlFragment);
 

@@ -2,6 +2,7 @@ package ch.fork.adhocrailway.android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,18 +15,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 
 
-/**
- * A simple {@link android.support.v4.app.Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link LocomotiveControlFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link LocomotiveControlFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class LocomotiveControlFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
@@ -66,6 +60,10 @@ public class LocomotiveControlFragment extends Fragment {
     }
 
     private void initEventHandling() {
+
+        FrameLayout selectedLocomotive = (FrameLayout) fragmentView.findViewById(R.id.selectedLocomotive);
+        selectedLocomotive.setOnClickListener(new SelectLocomotiveListener());
+
         SeekBar locomotive1Seekbar = (SeekBar) fragmentView.findViewById(R.id.locomotive1Speed);
         locomotive1Seekbar.setOnSeekBarChangeListener(new Locomotive1SpeedListener());
 
@@ -74,6 +72,9 @@ public class LocomotiveControlFragment extends Fragment {
 
         Button stopButton = (Button) fragmentView.findViewById(R.id.locomotive1Stop);
         stopButton.setOnClickListener(new Locomotive1StopListener());
+
+        Button emergencyStopButton = (Button) fragmentView.findViewById(R.id.locomotiveEmergencyStop);
+        emergencyStopButton.setOnClickListener(new EmergencyStopListener());
 
     }
 
@@ -106,6 +107,9 @@ public class LocomotiveControlFragment extends Fragment {
         if (selectedLocomotive != null) {
             label.setText(selectedLocomotive.getName());
             ImageHelper.fillImageViewFromBase64ImageString(imageView, selectedLocomotive.getImageBase64());
+
+            adHocRailwayApplication.getLocomotiveController().activateLoco(selectedLocomotive);
+
         } else {
             label.setText("no locomotive selected");
             imageView.setImageBitmap(null);
@@ -118,18 +122,27 @@ public class LocomotiveControlFragment extends Fragment {
         mListener = null;
     }
 
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
+    }
+
+    private class EmergencyStopListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            final Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
+            if (selectedLocomotive == null) {
+                return;
+            }
+
+            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    adHocRailwayApplication.getLocomotiveController().emergencyStop(selectedLocomotive);
+                    return null;
+                }
+            };
+            asyncTask.execute();
+        }
     }
 
     private class Locomotive1SpeedListener implements SeekBar.OnSeekBarChangeListener {
@@ -199,4 +212,15 @@ public class LocomotiveControlFragment extends Fragment {
         }
     }
 
+    private class SelectLocomotiveListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
+            if (selectedLocomotive == null || selectedLocomotive.getCurrentSpeed() == 0) {
+                startActivity(new Intent(getActivity(), LocomotiveSelectActivity.class));
+            } else {
+                Toast.makeText(getActivity(), "Please stop locomotive first", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
