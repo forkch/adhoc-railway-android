@@ -26,6 +26,7 @@ public class LocomotiveControlFragment extends Fragment {
     private AdHocRailwayApplication adHocRailwayApplication;
     private int number;
     private Locomotive selectedLocomotive;
+    private LinearLayout selectedLocomotiveView;
 
     public LocomotiveControlFragment() {
         // Required empty public constructor
@@ -59,6 +60,8 @@ public class LocomotiveControlFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fragmentView = inflater.inflate(R.layout.fragment_locomotive_control, container, false);
+
+        selectedLocomotiveView = (LinearLayout) fragmentView.findViewById(R.id.selectedLocomotive);
         initEventHandling();
 
         return fragmentView;
@@ -67,8 +70,7 @@ public class LocomotiveControlFragment extends Fragment {
 
     private void initEventHandling() {
 
-        FrameLayout selectedLocomotive = (FrameLayout) fragmentView.findViewById(R.id.selectedLocomotive);
-        selectedLocomotive.setOnClickListener(new SelectLocomotiveListener());
+        selectedLocomotiveView.setOnClickListener(new SelectLocomotiveListener());
 
         SeekBar locomotive1Seekbar = (SeekBar) fragmentView.findViewById(R.id.locomotive1Speed);
         locomotive1Seekbar.setOnSeekBarChangeListener(new Locomotive1SpeedListener());
@@ -100,15 +102,9 @@ public class LocomotiveControlFragment extends Fragment {
         super.onResume();
         adHocRailwayApplication = (AdHocRailwayApplication) getActivity().getApplication();
 
-        FrameLayout viewById = (FrameLayout) fragmentView.findViewById(R.id.selectedLocomotive);
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        TextView label = (TextView) selectedLocomotiveView.findViewById(R.id.label);
+        ImageView imageView = (ImageView) selectedLocomotiveView.findViewById(R.id.icon);
 
-        LinearLayout locomotiveRowView = (LinearLayout) inflater.inflate(R.layout.locomotive_row, null);
-        TextView label = (TextView) locomotiveRowView.findViewById(R.id.label);
-        ImageView imageView = (ImageView) locomotiveRowView.findViewById(R.id.icon);
-
-        viewById.removeAllViews();
-        viewById.addView(locomotiveRowView);
         if (selectedLocomotive != null) {
             label.setText(selectedLocomotive.getName());
             ImageHelper.fillImageViewFromBase64ImageString(imageView, selectedLocomotive.getImageBase64());

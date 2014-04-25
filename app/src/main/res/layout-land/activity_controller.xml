@@ -18,7 +18,7 @@
         android:padding="5dp">
 
         <Button
-            android:id="@+id/selectLocomotive"
+            android:id="@+id/selectedLocomotive"
             style="@style/AppTheme.Button.Primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
             android:id="@+id/selectedLocomotive"
             android:layout_width="fill_parent"
             android:layout_height="75dp"
-            android:layout_below="@+id/selectLocomotive"
+            android:layout_below="@+id/selectedLocomotive"
             android:layout_marginTop="5dp"
             android:onClick="onSelectLocomotiveClick"
             android:padding="5dp" />

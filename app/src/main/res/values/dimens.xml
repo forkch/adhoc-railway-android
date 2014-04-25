@@ -14,4 +14,6 @@
     <dimen name="stateButtonHeight">100dp</dimen>
     <dimen name="stateButtonWidth">50dp</dimen>
     <dimen name="numberButtonWidth">50dp</dimen>
+    <dimen name="number_button_margin">3dp</dimen>
+    <dimen name="number_button_text_size">20dp</dimen>
 </resources>
