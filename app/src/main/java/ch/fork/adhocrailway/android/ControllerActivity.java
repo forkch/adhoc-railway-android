@@ -2,41 +2,35 @@ package ch.fork.adhocrailway.android;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 
-public class ControllerActivity extends FragmentActivity implements NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener {
+public class ControllerActivity extends FragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener {
 
+    private static final int NUM_PAGES = 4;
     private AdHocRailwayApplication adHocRailwayApplication;
+    private ViewPager mPager;
+
+    private PagerAdapter mPagerAdapter;
+
+    public ControllerActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controller);
 
-        adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
-
-        FrameLayout numberControlContainer = (FrameLayout) findViewById(R.id.numberControlContainer);
-        numberControlContainer.removeAllViews();
-
-        FrameLayout locomotiveControlContainer = (FrameLayout) findViewById(R.id.locomotiveControlContainer);
-        locomotiveControlContainer.removeAllViews();
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        NumberControlFragment numberControl = NumberControlFragment.newInstance();
-        fragmentTransaction.add(R.id.numberControlContainer, numberControl);
-
-        LocomotiveControlFragment locomotiveControlFragment = LocomotiveControlFragment.newInstance();
-        fragmentTransaction.add(R.id.locomotiveControlContainer, locomotiveControlFragment);
-
-        fragmentTransaction.commit();
-
+        // Instantiate a ViewPager and a PagerAdapter.
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
     }
 
     @Override
@@ -44,6 +38,18 @@ public class ControllerActivity extends FragmentActivity implements NumberContro
         super.onResume();
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mPager.getCurrentItem() == 0) {
+            // If the user is currently looking at the first step, allow the system to handle the
+            // Back button. This calls finish() on this activity and pops the back stack.
+            super.onBackPressed();
+        } else {
+            // Otherwise, select the previous step.
+            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+        }
     }
 
     @Override
@@ -63,5 +69,21 @@ public class ControllerActivity extends FragmentActivity implements NumberContro
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        public ScreenSlidePagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return MainControllerFragment.newInstance(position);
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_PAGES;
+        }
     }
 }

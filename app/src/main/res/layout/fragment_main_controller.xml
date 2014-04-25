@@ -6,10 +6,16 @@
     android:padding="5dp"
     tools:context="${packageName}.${activityClass}">
 
-    <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/pager"
+    <FrameLayout
+        android:id="@+id/numberControlContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
+
+
+    <FrameLayout
+        android:id="@+id/locomotiveControlContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 
 </LinearLayout>

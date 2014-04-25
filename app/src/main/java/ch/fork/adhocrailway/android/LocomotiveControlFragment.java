@@ -24,6 +24,8 @@ public class LocomotiveControlFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
     private AdHocRailwayApplication adHocRailwayApplication;
+    private int number;
+    private Locomotive selectedLocomotive;
 
     public LocomotiveControlFragment() {
         // Required empty public constructor
@@ -36,8 +38,11 @@ public class LocomotiveControlFragment extends Fragment {
      * @return A new instance of fragment LocomotiveControlFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static LocomotiveControlFragment newInstance() {
+    public static LocomotiveControlFragment newInstance(int number) {
         LocomotiveControlFragment fragment = new LocomotiveControlFragment();
+        Bundle args = new Bundle();
+        args.putInt("number", number);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -45,6 +50,7 @@ public class LocomotiveControlFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            number = getArguments().getInt("number");
         }
     }
 
@@ -103,7 +109,6 @@ public class LocomotiveControlFragment extends Fragment {
 
         viewById.removeAllViews();
         viewById.addView(locomotiveRowView);
-        Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
         if (selectedLocomotive != null) {
             label.setText(selectedLocomotive.getName());
             ImageHelper.fillImageViewFromBase64ImageString(imageView, selectedLocomotive.getImageBase64());
@@ -122,13 +127,20 @@ public class LocomotiveControlFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
+            selectedLocomotive = (Locomotive) data.getSerializableExtra("selectedLocomotive");
+        }
+    }
+
     public interface OnFragmentInteractionListener {
     }
 
     private class EmergencyStopListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            final Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
             if (selectedLocomotive == null) {
                 return;
             }
@@ -148,7 +160,6 @@ public class LocomotiveControlFragment extends Fragment {
     private class Locomotive1SpeedListener implements SeekBar.OnSeekBarChangeListener {
         @Override
         public void onProgressChanged(SeekBar seekBar, final int progress, boolean fromUser) {
-            final Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
             if (selectedLocomotive == null) {
                 return;
             }
@@ -176,7 +187,6 @@ public class LocomotiveControlFragment extends Fragment {
     private class Locomotive1DirectionListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            final Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
             if (selectedLocomotive == null) {
                 return;
             }
@@ -196,7 +206,6 @@ public class LocomotiveControlFragment extends Fragment {
     private class Locomotive1StopListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            final Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
             if (selectedLocomotive == null) {
                 return;
             }
@@ -215,9 +224,8 @@ public class LocomotiveControlFragment extends Fragment {
     private class SelectLocomotiveListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            Locomotive selectedLocomotive = adHocRailwayApplication.getSelectedLocomotive();
             if (selectedLocomotive == null || selectedLocomotive.getCurrentSpeed() == 0) {
-                startActivity(new Intent(getActivity(), LocomotiveSelectActivity.class));
+                startActivityForResult(new Intent(getActivity(), LocomotiveSelectActivity.class), 0);
             } else {
                 Toast.makeText(getActivity(), "Please stop locomotive first", Toast.LENGTH_SHORT).show();
             }

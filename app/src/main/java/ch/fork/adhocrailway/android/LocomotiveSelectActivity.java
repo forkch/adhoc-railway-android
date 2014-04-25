@@ -48,8 +48,15 @@ public class LocomotiveSelectActivity extends ListActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                adHocRailwayApplication.setSelectedLocomotive(locomotives.get(position));
-                onBackPressed();
+                //adHocRailwayApplication.setSelectedLocomotive(locomotives.get(position));
+                Intent intent = getIntent();
+                intent.putExtra("selectedLocomotive", locomotives.get(position));
+                if (getParent() == null) {
+                    setResult(RESULT_OK, intent);
+                } else {
+                    getParent().setResult(RESULT_OK, intent);
+                }
+                finish();
             }
         });
 
