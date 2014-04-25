@@ -8,7 +8,9 @@ import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerTitleStrip;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,7 +142,6 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         Button emergencyStopButton = (Button) fragmentView.findViewById(R.id.locomotiveEmergencyStop);
         emergencyStopButton.setOnClickListener(new EmergencyStopListener());
-
     }
 
     private void updateSelectedLocomotive() {
@@ -150,7 +151,7 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         if (selectedLocomotive != null) {
             label.setText(selectedLocomotive.getName());
             ImageHelper.fillImageViewFromBase64ImageString(imageView, selectedLocomotive.getImageBase64());
-
+            mListener.onLocomotiveSelected();
             adHocRailwayApplication.getLocomotiveController().activateLoco(selectedLocomotive);
 
         } else {
@@ -203,11 +204,20 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         return Integer.parseInt(enteredNumberKeys.toString());
     }
 
+    public CharSequence getTitle() {
+        if(selectedLocomotive != null) {
+            return selectedLocomotive.getName();
+        }else {
+            return "n/a";
+        }
+    }
+
     private enum NumberControlState {
         TURNOUT, ROUTE, LOCOMOTIVE_FUNCTION;
     }
 
     public interface OnFragmentInteractionListener {
+        void onLocomotiveSelected();
     }
 
     private class EmergencyStopListener implements View.OnClickListener {

@@ -8,9 +8,14 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 
@@ -78,19 +83,36 @@ public class ControllerActivity extends FragmentActivity implements MainControll
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onLocomotiveSelected() {
+        mPagerAdapter.notifyDataSetChanged();
+    }
+
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        private final List<MainControllerFragment> fragments = new ArrayList<MainControllerFragment>();
+
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
+
+            for(int i = 0; i < NUM_PAGES; i++) {
+                MainControllerFragment mainControllerFragment = MainControllerFragment.newInstance(i);
+                fragments.add(mainControllerFragment);
+            }
         }
 
         @Override
         public Fragment getItem(int position) {
-            return MainControllerFragment.newInstance(position);
+            return fragments.get(position);
         }
 
         @Override
         public int getCount() {
             return NUM_PAGES;
+        }
+
+        @Override
+        public CharSequence getPageTitle (int position) {
+            return fragments.get(position).getTitle();
         }
     }
 }
