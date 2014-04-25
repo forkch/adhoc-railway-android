@@ -155,7 +155,7 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
             adHocRailwayApplication.getLocomotiveController().activateLoco(selectedLocomotive);
 
         } else {
-            label.setText("no locomotive selected");
+            label.setText("select locomotive");
             imageView.setImageBitmap(null);
         }
     }

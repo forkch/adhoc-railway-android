@@ -16,7 +16,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@drawable/bring_button_dark"
+            android:background="@drawable/bring_button_secondary"
+
             android:clickable="true"
             android:padding="10dp">
 
@@ -31,19 +32,27 @@
 
             <TextView
                 android:id="@+id/label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:padding="5dp"
                 android:text="Ae 621"
-                android:textSize="30px"></TextView>
+                android:layout_weight="1"
+                android:textSize="30px"
+                android:textColor="@color/bring_gray_dark"/>
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:background="@android:drawable/ic_menu_search"/>
         </LinearLayout>
 
         <SeekBar
             android:id="@+id/locomotive1Speed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:max="14" />
 
         <LinearLayout
