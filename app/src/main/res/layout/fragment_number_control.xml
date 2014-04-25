@@ -104,7 +104,7 @@
                 android:text="0" />
 
             <Button
-                android:id="@+id/turnoutButtonDot"
+                android:id="@+id/turnoutButtonPeriod"
                 android:layout_width="@dimen/numberButtonWidth"
                 android:layout_height="@dimen/numberButtonHeight"
                 android:text="." />
