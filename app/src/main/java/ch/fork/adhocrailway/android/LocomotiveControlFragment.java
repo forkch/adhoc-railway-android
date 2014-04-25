@@ -102,6 +102,10 @@ public class LocomotiveControlFragment extends Fragment {
         super.onResume();
         adHocRailwayApplication = (AdHocRailwayApplication) getActivity().getApplication();
 
+        updateSelectedLocomotive();
+    }
+
+    private void updateSelectedLocomotive() {
         TextView label = (TextView) selectedLocomotiveView.findViewById(R.id.label);
         ImageView imageView = (ImageView) selectedLocomotiveView.findViewById(R.id.icon);
 
@@ -123,12 +127,9 @@ public class LocomotiveControlFragment extends Fragment {
         mListener = null;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
-            selectedLocomotive = (Locomotive) data.getSerializableExtra("selectedLocomotive");
-        }
+    public void setSelectedLocomotive(Locomotive selectedLocomotive) {
+        this.selectedLocomotive = selectedLocomotive;
+        updateSelectedLocomotive();
     }
 
     public interface OnFragmentInteractionListener {

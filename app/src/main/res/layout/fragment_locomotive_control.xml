@@ -15,9 +15,10 @@
             android:id="@+id/selectedLocomotive"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:background="@drawable/bring_button_dark"
             android:clickable="true"
-            android:padding="5dp">
+            android:padding="10dp">
 
             <ImageView
                 android:id="@+id/icon"
@@ -33,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:text="@+id/label"
+                android:text="Ae 621"
                 android:textSize="30px"></TextView>
 
         </LinearLayout>
