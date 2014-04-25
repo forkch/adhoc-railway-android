@@ -1,8 +1,8 @@
 <resources>
     <string name="title_activity_settings">Settings</string>
     <string name="pref_title_adhocServerHost">AdHoc-Server Host</string>
-    <string name="pref_default_adhocServerHost">10.0.2.2</string>
+    <string name="pref_default_adhocServerHost">forkch.dyndns.org</string>
     <string name="pref_title_srcpServerHost">SRCP-Server Host</string>
-    <string name="pref_default_srcpServerHost">10.0.2.2</string>
+    <string name="pref_default_srcpServerHost">forkch.dyndns.org</string>
 
 </resources>
