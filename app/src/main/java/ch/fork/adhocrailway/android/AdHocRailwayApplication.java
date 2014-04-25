@@ -60,7 +60,7 @@ import timber.log.Timber;
  */
 public class AdHocRailwayApplication extends Application implements LocomotiveServiceListener, ServiceListener, TurnoutManagerListener, RouteManagerListener, LocomotiveManagerListener {
     //private static final String SERVER_HOST = "adhocserver";
-    public static final String SERVER_HOST = "10.0.2.2";
+    public static final String SERVER_HOST = "forkch.dyndns.org";
     private SortedSet<LocomotiveGroup> locomotiveGroups;
     private Locomotive selectedLocomotive;
 
