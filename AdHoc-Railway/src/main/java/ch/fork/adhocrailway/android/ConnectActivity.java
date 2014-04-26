@@ -10,10 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import ch.fork.AdHocRailway.manager.impl.events.LocomotivesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.RoutesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
@@ -21,7 +24,16 @@ import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
 public class ConnectActivity extends Activity {
 
     private static final String TAG = ConnectActivity.class.getSimpleName();
-    private Button connectButton;
+    @InjectView(R.id.connectButton)
+    Button connectButton;
+
+    @InjectView(R.id.connectingProgress)
+     ProgressBar connectingProgress;
+    @InjectView(R.id.adhocServerHostTextView)
+    TextView adHocServerHostTextView;
+    @InjectView(R.id.srcpServerHostTextView)
+    TextView srcpServerHostTextView;
+
     private AdHocRailwayApplication adHocRailwayApplication;
     private boolean locomotivesLoaded;
     private boolean routesLoaded;
@@ -33,25 +45,28 @@ public class ConnectActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
-        connectButton = (Button) findViewById(R.id.connectButton);
+        ButterKnife.inject(this);
         initEventHandling();
     }
 
     private void initValues() {
 
+        connectButton.setEnabled(true);
+        connectingProgress.setVisibility(View.INVISIBLE);
+
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String adhocServerHost = sharedPref.getString(SettingsActivity.KEY_ADHOC_SERVER_HOST, AdHocRailwayApplication.SERVER_HOST);
         String srcpServerHost = sharedPref.getString(SettingsActivity.KEY_SRCP_SERVER_HOST, AdHocRailwayApplication.SERVER_HOST);
-        TextView adHocServerHostTextView = (TextView) findViewById(R.id.adhocServerHostTextView);
-        TextView srcpServerHostTextView = (TextView) findViewById(R.id.srcpServerHostTextView);
         adHocServerHostTextView.setText(getString(R.string.adhocServerHostLabel) + " " + adhocServerHost);
-        srcpServerHostTextView.setText(getString(R.string.srcpServerHostLabel) + " "    + srcpServerHost);
+        srcpServerHostTextView.setText(getString(R.string.srcpServerHostLabel) + " " + srcpServerHost);
     }
 
     private void initEventHandling() {
         connectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                connectingProgress.setVisibility(View.VISIBLE);
+                connectButton.setEnabled(false);
                 adHocRailwayApplication.clearServers();
                 adHocRailwayApplication.connectToPersistence();
                 adHocRailwayApplication.connectToRailwayDevice();

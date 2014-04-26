@@ -33,6 +33,15 @@
         android:layout_marginTop="10dp"
         android:text="Connect" />
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/connectingProgress"
+        android:layout_gravity="center_horizontal"
+        android:visibility="visible"
+        android:indeterminate="true" />
+
     <View
         android:layout_width="wrap_content"
         android:layout_height="20dp" android:layout_weight="1"/>
