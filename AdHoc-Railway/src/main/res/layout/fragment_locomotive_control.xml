@@ -38,7 +38,7 @@
                 android:padding="5dp"
                 android:text="Ae 621"
                 android:textColor="@color/bring_gray_dark"
-                android:textSize="30px" />
+                android:textSize="20dp" />
 
             <ImageView
                 android:layout_width="wrap_content"

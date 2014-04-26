@@ -10,7 +10,7 @@
         android:id="@+id/numberControlContainer"
         layout="@layout/fragment_number_control"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1" />
 
     <View
@@ -23,8 +23,7 @@
         android:id="@+id/locomotiveControlContainer"
         layout="@layout/fragment_locomotive_control"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="2" />
+        android:layout_height="wrap_content" />
 
 
 </LinearLayout>

@@ -15,9 +15,9 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ControllerActivity extends FragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener {
+public class ControllerActivity extends FragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener, PowerFragment.OnPowerFragmentInteractionListener {
 
-    private static final int NUM_PAGES = 4;
+    private static final int NUM_CONTROLLER_FRAGMENTS = 4;
     private AdHocRailwayApplication adHocRailwayApplication;
     private ViewPager mPager;
 
@@ -35,6 +35,7 @@ public class ControllerActivity extends FragmentActivity implements MainControll
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+        mPager.setCurrentItem(1);
     }
 
     @Override
@@ -102,11 +103,13 @@ public class ControllerActivity extends FragmentActivity implements MainControll
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         private final List<MainControllerFragment> fragments = new ArrayList<MainControllerFragment>();
+        private PowerFragment powerFragment;
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
 
-            for(int i = 0; i < NUM_PAGES; i++) {
+            powerFragment = PowerFragment.newInstance();
+            for (int i = 0; i < NUM_CONTROLLER_FRAGMENTS; i++) {
                 MainControllerFragment mainControllerFragment = MainControllerFragment.newInstance(i);
                 fragments.add(mainControllerFragment);
             }
@@ -114,16 +117,22 @@ public class ControllerActivity extends FragmentActivity implements MainControll
 
         @Override
         public Fragment getItem(int position) {
-            return fragments.get(position);
+            if (position == 0) {
+                return powerFragment;
+            }
+            return fragments.get(position - 1);
         }
 
         @Override
         public int getCount() {
-            return NUM_PAGES;
+            return 1 + fragments.size();
         }
 
         @Override
         public CharSequence getPageTitle (int position) {
+            if (position == 0) {
+                return "Power";
+            }
             return fragments.get(position).getTitle();
         }
     }
