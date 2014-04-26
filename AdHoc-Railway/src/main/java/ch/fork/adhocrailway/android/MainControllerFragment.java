@@ -38,6 +38,7 @@ import ch.fork.AdHocRailway.model.turnouts.Turnout;
 
 public class MainControllerFragment extends Fragment implements NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener {
 
+    private static final String TAG = MainControllerFragment.class.getSimpleName();
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
     private int number;
