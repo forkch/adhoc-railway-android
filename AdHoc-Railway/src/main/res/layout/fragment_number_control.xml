@@ -226,7 +226,7 @@
 
                 <Button
                     android:id="@+id/turnoutButton0"
-                    style="@style/AppTheme.Button.Primary"
+                    style="@style/AppTheme.Button.Secondary"
                     android:layout_width="@dimen/numberButtonWidth"
                     android:layout_height="match_parent"
                     android:layout_margin="@dimen/number_button_margin"
@@ -273,7 +273,7 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/number_button_margin"
                 android:layout_weight="1"
-                android:text="Enter"
+                android:text="E"
                 android:textSize="@dimen/number_button_text_size"
                 android:textStyle="bold" />
 
