@@ -195,7 +195,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         } else {
             connectToAdHocServer();
         }
-
     }
 
     private void loadXml() {

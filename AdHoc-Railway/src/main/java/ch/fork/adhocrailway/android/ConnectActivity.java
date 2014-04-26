@@ -48,8 +48,8 @@ public class ConnectActivity extends Activity {
         String srcpServerHost = sharedPref.getString(SettingsActivity.KEY_SRCP_SERVER_HOST, AdHocRailwayApplication.SERVER_HOST);
         TextView adHocServerHostTextView = (TextView) findViewById(R.id.adhocServerHostTextView);
         TextView srcpServerHostTextView = (TextView) findViewById(R.id.srcpServerHostTextView);
-        adHocServerHostTextView.setText(getString(R.string.adhocServerHostLabel) + adhocServerHost);
-        srcpServerHostTextView.setText(getString(R.string.srcpServerHostLabel) + srcpServerHost);
+        adHocServerHostTextView.setText(getString(R.string.adhocServerHostLabel) + " " + adhocServerHost);
+        srcpServerHostTextView.setText(getString(R.string.srcpServerHostLabel) + " "    + srcpServerHost);
     }
 
     private void initEventHandling() {
