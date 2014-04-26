@@ -133,7 +133,7 @@ public class ControllerActivity extends FragmentActivity implements MainControll
             if (position == 0) {
                 return "Power";
             }
-            return fragments.get(position).getTitle();
+            return fragments.get(position - 1).getTitle();
         }
     }
 }
