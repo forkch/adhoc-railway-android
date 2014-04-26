@@ -34,11 +34,11 @@
                 android:id="@+id/label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:padding="5dp"
                 android:text="Ae 621"
-                android:layout_weight="1"
-                android:textSize="30px"
-                android:textColor="@color/bring_gray_dark"/>
+                android:textColor="@color/bring_gray_dark"
+                android:textSize="30px" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -51,8 +51,8 @@
             android:id="@+id/locomotive1Speed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
             android:max="14" />
 
         <LinearLayout
