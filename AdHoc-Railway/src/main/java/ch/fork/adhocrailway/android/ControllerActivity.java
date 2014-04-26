@@ -1,6 +1,5 @@
 package ch.fork.adhocrailway.android;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,7 +7,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,8 +14,6 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 
 public class ControllerActivity extends FragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener {
 
@@ -45,6 +41,7 @@ public class ControllerActivity extends FragmentActivity implements MainControll
     protected void onResume() {
         super.onResume();
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
+        onLocomotiveSelected();
 
     }
 
@@ -83,9 +80,11 @@ public class ControllerActivity extends FragmentActivity implements MainControll
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void onLocomotiveSelected() {
         mPagerAdapter.notifyDataSetChanged();
+        mPager.requestLayout();
     }
 
     @Override

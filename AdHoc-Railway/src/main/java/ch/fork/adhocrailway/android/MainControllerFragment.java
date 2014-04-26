@@ -2,7 +2,6 @@ package ch.fork.adhocrailway.android;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -162,11 +161,6 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         }
 
         mListener.onLocomotiveSelected();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        updateSelectedLocomotive();
     }
 
     private void initNumberControlEventHandling() {
@@ -373,6 +367,11 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         protected abstract void doPerformStateAction(RouteController routeController, Route routeByNumber);
 
+        protected void storePreviousChangedObject(Object obj) {
+            previousChangedObjects.addFirst(obj);
+            updatePreviousChangedObject();
+        }
+
         @Override
         public void onClick(View v) {
             AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
@@ -391,8 +390,6 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                         }
                         TurnoutController turnoutController = adHocRailwayApplication.getTurnoutController();
                         doPerformStateAction(turnoutController, turnoutByNumber);
-                        previousChangedObjects.addFirst(turnoutByNumber);
-                        updatePreviousChangedObject();
                     } else {
                         Route routeByNumber = adHocRailwayApplication.getRouteManager().getRouteByNumber(enteredNumber);
                         if (routeByNumber == null) {
@@ -458,13 +455,14 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         @Override
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
-
             turnoutController.setNonDefaultState(turnout);
+            storePreviousChangedObject(turnout);
         }
 
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
             routeController.enableRoute(routeByNumber);
+            storePreviousChangedObject(routeByNumber);
         }
     }
 
@@ -472,8 +470,8 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         @Override
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
-
             turnoutController.setCurvedLeft(turnout);
+            storePreviousChangedObject(turnout);
         }
 
         @Override
@@ -485,7 +483,6 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         @Override
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
-
             turnoutController.setStraight(turnout);
         }
 
@@ -498,8 +495,8 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         @Override
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
-
             turnoutController.setCurvedRight(turnout);
+            storePreviousChangedObject(turnout);
         }
 
         @Override
