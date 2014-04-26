@@ -34,6 +34,9 @@ public class ConnectActivity extends Activity {
     @InjectView(R.id.srcpServerHostTextView)
     TextView srcpServerHostTextView;
 
+    @InjectView(R.id.serversTextView)
+    TextView serversTextView;
+
     private AdHocRailwayApplication adHocRailwayApplication;
     private boolean locomotivesLoaded;
     private boolean routesLoaded;
@@ -55,6 +58,12 @@ public class ConnectActivity extends Activity {
         connectingProgress.setVisibility(View.INVISIBLE);
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean dummyServers = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
+        if(dummyServers) {
+            serversTextView.setText("Servers: DUMMY!!!");
+        } else {
+            serversTextView.setText("Servers:");
+        }
         String adhocServerHost = sharedPref.getString(SettingsActivity.KEY_ADHOC_SERVER_HOST, AdHocRailwayApplication.SERVER_HOST);
         String srcpServerHost = sharedPref.getString(SettingsActivity.KEY_SRCP_SERVER_HOST, AdHocRailwayApplication.SERVER_HOST);
         adHocServerHostTextView.setText(getString(R.string.adhocServerHostLabel) + " " + adhocServerHost);

@@ -11,7 +11,7 @@
 
     <TextView
         android:id="@+id/welcome_title"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:gravity="center"
@@ -28,7 +28,7 @@
     <Button
         android:id="@+id/connectButton"
         style="@style/AppTheme.Button.Primary"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Connect" />
@@ -47,19 +47,20 @@
         android:layout_height="20dp" android:layout_weight="1"/>
 
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Servers:" />
+        android:text="Servers:"
+        android:id="@+id/serversTextView"/>
 
     <TextView
         android:id="@+id/adhocServerHostTextView"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="adHocServerHost" />
 
     <TextView
         android:id="@+id/srcpServerHostTextView"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="srcpServerHost" />
 

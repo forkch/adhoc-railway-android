@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerTitleStrip;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -396,6 +397,8 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                     TextView v = new TextView(getActivity());
                     v.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 40);
                     v.setText(Integer.toString(t.getNumber()));
+                    v.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                    v.setGravity(Gravity.CENTER);
                     lastTurnouts.addView(v);
                 }
             }
