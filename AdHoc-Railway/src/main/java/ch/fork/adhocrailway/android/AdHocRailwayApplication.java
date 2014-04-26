@@ -9,8 +9,6 @@ import android.util.Log;
 
 import com.squareup.otto.Bus;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.SortedSet;
@@ -157,6 +155,8 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
                     srcpTurnoutControlAdapter.setSession(session);
                     srcpRouteControlAdapter.setSession(session);
                     srcpLocomotiveControlAdapter.setSession(session);
+
+                    srcpRouteControlAdapter.setRoutingDelay(500);
 
                     locomotiveController = srcpLocomotiveControlAdapter;
                     turnoutController = srcpTurnoutControlAdapter;

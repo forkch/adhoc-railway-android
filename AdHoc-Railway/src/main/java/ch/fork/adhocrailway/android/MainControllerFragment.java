@@ -2,13 +2,10 @@ package ch.fork.adhocrailway.android;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerTitleStrip;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -16,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -27,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
 
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
@@ -48,7 +43,7 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
     private TextView currentNumber;
     private NumberControlState numberControlState = NumberControlState.TURNOUT;
     private TextView routeIndicator;
-    private Deque<Turnout> previousTurnouts = new ArrayDeque<Turnout>();
+    private Deque<Object> previousChangedObjects = new ArrayDeque<Object>();
 
     public MainControllerFragment() {
     }
@@ -159,13 +154,19 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         if (selectedLocomotive != null) {
             label.setText(selectedLocomotive.getName());
             ImageHelper.fillImageViewFromBase64ImageString(imageView, selectedLocomotive.getImageBase64());
-            mListener.onLocomotiveSelected();
             adHocRailwayApplication.getLocomotiveController().activateLoco(selectedLocomotive);
 
         } else {
             label.setText("select locomotive");
             imageView.setImageBitmap(null);
         }
+
+        mListener.onLocomotiveSelected();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        updateSelectedLocomotive();
     }
 
     private void initNumberControlEventHandling() {
@@ -219,6 +220,29 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         } else {
             return "n/a";
         }
+    }
+
+    private void updatePreviousChangedObject() {
+        fragmentView.post(new Runnable() {
+            @Override
+            public void run() {
+                LinearLayout lastTurnouts = (LinearLayout) fragmentView.findViewById(R.id.lastTurnouts);
+                lastTurnouts.removeAllViews();
+                for (Object obj : previousChangedObjects) {
+                    TextView v = new TextView(getActivity());
+                    v.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
+                    if (obj instanceof Turnout) {
+                        v.setText("T" + Integer.toString(((Turnout) obj).getNumber()));
+                    } else {
+                        v.setText("R" + Integer.toString(((Route) obj).getNumber()));
+                    }
+                    v.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                    v.setGravity(Gravity.CENTER);
+                    lastTurnouts.addView(v);
+                }
+            }
+        });
+
     }
 
     private enum NumberControlState {
@@ -367,8 +391,8 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                         }
                         TurnoutController turnoutController = adHocRailwayApplication.getTurnoutController();
                         doPerformStateAction(turnoutController, turnoutByNumber);
-                        previousTurnouts.addFirst(turnoutByNumber);
-                        updatePreviousTurnouts();
+                        previousChangedObjects.addFirst(turnoutByNumber);
+                        updatePreviousChangedObject();
                     } else {
                         Route routeByNumber = adHocRailwayApplication.getRouteManager().getRouteByNumber(enteredNumber);
                         if (routeByNumber == null) {
@@ -387,42 +411,29 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
     }
 
-    private void updatePreviousTurnouts() {
-        fragmentView.post(new Runnable() {
-            @Override
-            public void run() {
-                LinearLayout lastTurnouts = (LinearLayout) fragmentView.findViewById(R.id.lastTurnouts);
-                lastTurnouts.removeAllViews();
-                for (Turnout t : previousTurnouts) {
-                    TextView v = new TextView(getActivity());
-                    v.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 40);
-                    v.setText(Integer.toString(t.getNumber()));
-                    v.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    v.setGravity(Gravity.CENTER);
-                    lastTurnouts.addView(v);
-                }
-            }
-        });
-
-    }
-
     private class DefaultStateHandler extends NumberControlActionHandler {
         @Override
         public void onClick(View v) {
             if (StringUtils.isBlank(enteredNumberKeys.toString())) {
-                if (previousTurnouts.isEmpty()) {
+                if (previousChangedObjects.isEmpty()) {
                     return;
                 }
-                final Turnout turnout = previousTurnouts.removeFirst();
-                if (turnout == null) {
+                final Object obj = previousChangedObjects.removeFirst();
+
+                if (obj == null) {
                     return;
                 }
                 AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
                     @Override
                     protected Void doInBackground(Void... params) {
-                        doPerformStateAction(adHocRailwayApplication.getTurnoutController(), turnout);
-                        updatePreviousTurnouts();
+
+                        if (obj instanceof Turnout) {
+                            doPerformStateAction(adHocRailwayApplication.getTurnoutController(), (Turnout) obj);
+                        } else {
+                            doPerformStateAction(adHocRailwayApplication.getRouteController(), (Route) obj);
+                        }
+                        updatePreviousChangedObject();
                         return null;
                     }
                 };
