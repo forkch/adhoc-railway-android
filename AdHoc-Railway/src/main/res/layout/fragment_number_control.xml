@@ -10,14 +10,43 @@
         android:layout_height="fill_parent"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/currentNumber"
-            android:layout_width="75dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:focusableInTouchMode="false"
-            android:gravity="center|top"
-            android:text="---"
-            android:textSize="40dp" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/currentNumber"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="false"
+                android:gravity="center|top"
+                android:text="---"
+                android:textSize="40dp" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/routeIndicator"
+                android:visibility="invisible"
+                android:gravity="right"
+                android:padding="5dp"
+                android:text="R" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="History"
+                android:gravity="center"
+                android:layout_marginBottom="5dp" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:id="@+id/lastTurnouts"></LinearLayout>
+        </LinearLayout>
+
 
         <LinearLayout
             android:id="@+id/turnoutGrid"
