@@ -25,29 +25,29 @@
                 android:textSize="40dp" />
 
             <TextView
+                android:id="@+id/routeIndicator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/routeIndicator"
-                android:visibility="invisible"
                 android:gravity="right"
                 android:padding="5dp"
-                android:text="R" />
+                android:text="R"
+                android:visibility="invisible" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="History"
+                android:layout_marginBottom="5dp"
                 android:gravity="center"
-                android:layout_marginBottom="5dp" />
+                android:text="History" />
 
             <LinearLayout
+                android:id="@+id/lastTurnouts"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
                 android:layout_gravity="center"
-                android:id="@+id/lastTurnouts">
+                android:orientation="vertical">
 
-                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
 
@@ -250,8 +250,9 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="90dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_weight="1.7"
             android:orientation="vertical">
 
             <Button
