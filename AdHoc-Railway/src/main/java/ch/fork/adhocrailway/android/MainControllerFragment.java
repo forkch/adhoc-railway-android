@@ -191,7 +191,6 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         Button periodButton = (Button) fragmentView.findViewById(R.id.turnoutButtonPeriod);
         periodButton.setOnClickListener(new PeriodButtonHandler());
-
     }
 
     private void resetNumbers() {

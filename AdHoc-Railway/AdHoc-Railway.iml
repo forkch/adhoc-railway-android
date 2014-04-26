@@ -83,6 +83,7 @@
     <orderEntry type="library" exported="" name="ch.fork.adhocrailway.railway.srcp-2.2.3" level="project" />
     <orderEntry type="library" exported="" name="xstream-1.4.4" level="project" />
     <orderEntry type="library" exported="" name="ch.fork.adhocrailway.persistence.adhocserver-2.2.3" level="project" />
+    <orderEntry type="library" exported="" name="android-logging-log4j-1.0.3" level="project" />
     <orderEntry type="library" exported="" name="ch.fork.adhocrailway.service-2.2.3" level="project" />
     <orderEntry type="library" exported="" name="ch.fork.adhocrailway.persistence-2.2.3" level="project" />
     <orderEntry type="library" exported="" name="socketio" level="project" />

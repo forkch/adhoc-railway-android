@@ -9,6 +9,9 @@ import android.util.Log;
 
 import com.squareup.otto.Bus;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.SortedSet;
 import java.util.UUID;
@@ -59,6 +62,7 @@ import timber.log.Timber;
  * Created by fork on 4/16/14.
  */
 public class AdHocRailwayApplication extends Application implements LocomotiveServiceListener, ServiceListener, TurnoutManagerListener, RouteManagerListener, LocomotiveManagerListener {
+    public final static String TAG = AdHocRailwayApplication.class.getSimpleName();
     //private static final String SERVER_HOST = "adhocserver";
     public static final String SERVER_HOST = "forkch.dyndns.org";
     private SortedSet<LocomotiveGroup> locomotiveGroups;
@@ -81,6 +85,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     @Override
     public void onCreate() {
         super.onCreate();
+        ConfigureLog4J.configure();
         bus = new Bus();
         bus.register(this);
         handler = new Handler();
@@ -216,9 +221,13 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
             @Override
             protected Void doInBackground(Void... params) {
                 InputStream inputStream = getApplicationContext().getResources().openRawResource(R.raw.weekend_2014);
-                Log.i("", inputStream.toString());
-                xmlServiceHelper.loadFile(xmlLocomotiveService, xmlTurnoutService, xmlRouteService, inputStream);
 
+                xmlServiceHelper.loadFile(xmlLocomotiveService, xmlTurnoutService, xmlRouteService, inputStream);
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return null;
             }
         };
@@ -303,41 +312,41 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     @Override
     public void locomotiveAdded(Locomotive locomotive) {
-        Log.i("", String.valueOf(locomotive));
+        Log.i(TAG, String.valueOf(locomotive));
     }
 
     @Override
     public void locomotiveUpdated(Locomotive locomotive) {
-        Log.i("", String.valueOf(locomotive));
+        Log.i(TAG, String.valueOf(locomotive));
     }
 
     @Override
     public void locomotiveRemoved(Locomotive locomotive) {
 
-        Log.i("", String.valueOf(locomotive));
+        Log.i(TAG, String.valueOf(locomotive));
     }
 
     @Override
     public void locomotiveGroupAdded(LocomotiveGroup group) {
 
-        Log.i("", String.valueOf(group));
+        Log.i(TAG, String.valueOf(group));
     }
 
     @Override
     public void locomotiveGroupUpdated(LocomotiveGroup group) {
 
-        Log.i("", String.valueOf(group));
+        Log.i(TAG, String.valueOf(group));
     }
 
     @Override
     public void locomotiveGroupRemoved(LocomotiveGroup group) {
 
-        Log.i("", String.valueOf(group));
+        Log.i(TAG, String.valueOf(group));
     }
 
     @Override
     public void locomotivesUpdated(final SortedSet<LocomotiveGroup> locomotiveGroups) {
-        Log.i("", String.valueOf(locomotiveGroups));
+        Log.i(TAG, String.valueOf(locomotiveGroups));
         setLocomotiveGroups(locomotiveGroups);
         handler.post(new Runnable() {
             @Override
@@ -437,7 +446,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     @Override
     public void connected() {
-        Log.i("", "connected");
+        Log.i(TAG, "connected");
     }
 
     @Override
@@ -449,7 +458,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     @Override
     public void disconnected() {
 
-        Log.i("", "disconnected");
+        Log.i(TAG, "disconnected");
     }
 
 

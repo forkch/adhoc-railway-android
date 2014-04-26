@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:name="ch.fork.adhocrailway.android.AdHocRailwayApplication"
@@ -25,14 +26,11 @@
         <activity
             android:name=".ControllerActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:immersive="true"></activity>
 
         <activity
-            android:name="ch.fork.adhocrailway.android.LocomotiveSelectActivity"
-            android:parentActivityName=".ControllerActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="MainActivity" />
+            android:name="ch.fork.adhocrailway.android.LocomotiveSelectActivity">
         </activity>
         <activity
             android:name=".SettingsActivity"

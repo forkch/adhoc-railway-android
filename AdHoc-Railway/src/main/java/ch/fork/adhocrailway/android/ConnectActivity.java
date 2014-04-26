@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,18 +20,13 @@ import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
 
 public class ConnectActivity extends Activity {
 
+    private static final String TAG = ConnectActivity.class.getSimpleName();
     private Button connectButton;
     private AdHocRailwayApplication adHocRailwayApplication;
     private boolean locomotivesLoaded;
     private boolean routesLoaded;
     private boolean turnoutsLoaded;
     private boolean connectedToRailwayDevice;
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initValues();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +59,22 @@ public class ConnectActivity extends Activity {
         });
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
         adHocRailwayApplication.getBus().register(this);
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initValues();
+        locomotivesLoaded = false;
+        turnoutsLoaded = false;
+        routesLoaded = false;
+        connectedToRailwayDevice = false;
+    }
+
 
     @Override
     protected void onStop() {
@@ -104,6 +111,7 @@ public class ConnectActivity extends Activity {
 
     @Subscribe
     public void locomotivesUpdated(LocomotivesUpdatedEvent event) {
+        Log.i(TAG, "received LocomotivesUpdatedEvent");
         locomotivesLoaded = true;
         startMainActivityIfEverythingIsLoaded();
     }
@@ -116,12 +124,14 @@ public class ConnectActivity extends Activity {
 
     @Subscribe
     public void turnoutsUpdates(TurnoutsUpdatedEvent event) {
+        Log.i(TAG, "received TurnoutsUpdatedEvent");
         turnoutsLoaded = true;
         startMainActivityIfEverythingIsLoaded();
     }
 
     @Subscribe
     public void routesUpdated(RoutesUpdatedEvent event) {
+        Log.i(TAG, "received RoutesUpdatedEvent");
         routesLoaded = true;
         startMainActivityIfEverythingIsLoaded();
     }
