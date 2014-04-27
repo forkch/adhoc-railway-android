@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="5dp"
+    android:padding="@dimen/bring_margin"
     tools:context="${packageName}.${activityClass}">
 
     <include
@@ -16,6 +16,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="2dip"
+        android:layout_marginTop="@dimen/bring_margin"
         android:background="@color/bring_gray" />
 
 
@@ -23,7 +24,8 @@
         android:id="@+id/locomotiveControlContainer"
         layout="@layout/fragment_locomotive_control"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/bring_margin" />
 
 
 </LinearLayout>

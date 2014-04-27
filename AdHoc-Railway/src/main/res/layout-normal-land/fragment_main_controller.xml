@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:padding="5dp"
+    android:padding="@dimen/bring_margin"
     tools:context="${packageName}.${activityClass}">
 
     <include
@@ -16,6 +16,7 @@
     <View
         android:layout_width="2dp"
         android:layout_height="fill_parent"
+        android:layout_marginLeft="@dimen/bring_margin"
         android:background="@color/bring_gray" />
 
     <include
@@ -23,6 +24,7 @@
         layout="@layout/fragment_locomotive_control"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/bring_margin"
         android:layout_weight="1.8" />
 
 </LinearLayout>
