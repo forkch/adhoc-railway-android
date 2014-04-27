@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import ch.fork.AdHocRailway.controllers.LocomotiveController;
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
@@ -81,7 +82,7 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         selectedLocomotiveView = (LinearLayout) fragmentView.findViewById(R.id.selectedLocomotive);
         initNumberControlEventHandling();
-        initEventHandling();
+        initLocomotiveEventHandling();
 
         return fragmentView;
 
@@ -129,7 +130,7 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         }
     }
 
-    private void initEventHandling() {
+    private void initLocomotiveEventHandling() {
 
         selectedLocomotiveView.setOnClickListener(new SelectLocomotiveListener());
 
@@ -144,6 +145,15 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         Button emergencyStopButton = (Button) fragmentView.findViewById(R.id.locomotiveEmergencyStop);
         emergencyStopButton.setOnClickListener(new EmergencyStopListener());
+
+        for (int i = 0; i < 5; i++) {
+            Button functionButton = (Button) fragmentView.findViewById(getResources().getIdentifier("locomotive1F" + i, "id", getActivity().getPackageName()));
+            if (functionButton != null) {
+                //some layout have no function buttons
+                functionButton.setOnClickListener(new FunctionButtonClickListener(i));
+            }
+        }
+
     }
 
     private void updateSelectedLocomotive() {
@@ -532,4 +542,31 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
     }
 
 
+    private class FunctionButtonClickListener implements View.OnClickListener {
+        private int functionNumber;
+
+        public FunctionButtonClickListener(int functionNumber) {
+            this.functionNumber = functionNumber;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (selectedLocomotive == null) {
+                return;
+            }
+
+            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    LocomotiveController locomotiveController = adHocRailwayApplication.getLocomotiveController();
+                    boolean currentFunctionValue = selectedLocomotive.getCurrentFunctions()[functionNumber];
+                    locomotiveController.setFunction(selectedLocomotive, functionNumber, !currentFunctionValue, 0);
+                    return null;
+                }
+            };
+            asyncTask.execute();
+
+        }
+    }
 }

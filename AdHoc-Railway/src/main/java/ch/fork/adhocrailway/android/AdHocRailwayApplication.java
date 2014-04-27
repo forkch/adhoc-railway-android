@@ -15,9 +15,11 @@ import java.util.SortedSet;
 import java.util.UUID;
 
 import ch.fork.AdHocRailway.controllers.LocomotiveController;
+import ch.fork.AdHocRailway.controllers.PowerController;
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyLocomotiveController;
+import ch.fork.AdHocRailway.controllers.impl.dummy.DummyPowerController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyRouteController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyTurnoutController;
 import ch.fork.AdHocRailway.manager.LocomotiveManager;
@@ -34,6 +36,7 @@ import ch.fork.AdHocRailway.manager.impl.events.RoutesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
+import ch.fork.AdHocRailway.model.power.PowerSupply;
 import ch.fork.AdHocRailway.model.turnouts.Route;
 import ch.fork.AdHocRailway.model.turnouts.RouteGroup;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
@@ -48,6 +51,7 @@ import ch.fork.AdHocRailway.persistence.xml.impl.XMLLocomotiveService;
 import ch.fork.AdHocRailway.persistence.xml.impl.XMLRouteService;
 import ch.fork.AdHocRailway.persistence.xml.impl.XMLTurnoutService;
 import ch.fork.AdHocRailway.railway.srcp.SRCPLocomotiveControlAdapter;
+import ch.fork.AdHocRailway.railway.srcp.SRCPPowerControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPRouteControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 import ch.fork.AdHocRailway.services.AdHocServiceException;
@@ -69,6 +73,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     private LocomotiveController locomotiveController;
     private TurnoutController turnoutController;
     private RouteController routeController;
+    private PowerController powerController;
 
     private TurnoutManager turnoutManager;
     private RouteManager routeManager;
@@ -79,11 +84,12 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     private SRCPSession session;
     private String adhocServerHost;
     private String srcpServerHost;
+    private PowerSupply powerSupply;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        ConfigureLog4J.configure();
+        //ConfigureLog4J.configure();
         bus = new Bus();
         bus.register(this);
         handler = new Handler();
@@ -126,6 +132,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         turnoutController = new DummyTurnoutController();
         routeController = new DummyRouteController(turnoutController);
         locomotiveController = new DummyLocomotiveController();
+        powerController = new DummyPowerController();
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -151,16 +158,23 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
                     SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter();
                     SRCPRouteControlAdapter srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter);
                     SRCPLocomotiveControlAdapter srcpLocomotiveControlAdapter = new SRCPLocomotiveControlAdapter();
+                    SRCPPowerControlAdapter srcpPowerControlAdapter = new SRCPPowerControlAdapter();
 
                     srcpTurnoutControlAdapter.setSession(session);
                     srcpRouteControlAdapter.setSession(session);
                     srcpLocomotiveControlAdapter.setSession(session);
+                    srcpPowerControlAdapter.setSession(session);
+
+                    powerSupply = new PowerSupply(1);
+                    srcpPowerControlAdapter.addOrUpdatePowerSupply(powerSupply);
+
 
                     srcpRouteControlAdapter.setRoutingDelay(500);
 
                     locomotiveController = srcpLocomotiveControlAdapter;
                     turnoutController = srcpTurnoutControlAdapter;
                     routeController = srcpRouteControlAdapter;
+                    powerController = srcpPowerControlAdapter;
 
                     handler.post(new Runnable() {
                         @Override
@@ -273,6 +287,10 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         return locomotiveController;
     }
 
+    public PowerController getPowerController() {
+        return powerController;
+    }
+
     public TurnoutManager getTurnoutManager() {
         return turnoutManager;
     }
@@ -285,6 +303,9 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         return locomotiveManager;
     }
 
+    public PowerSupply getPowerSupply() {
+        return powerSupply;
+    }
 
     public Bus getBus() {
         return bus;

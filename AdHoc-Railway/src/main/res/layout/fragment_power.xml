@@ -15,18 +15,19 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/boosterAllOnButton"
                 style="@style/AppTheme.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/bring_margin"
                 android:layout_weight="1"
                 android:text="All on" />
 
             <Button
-                style="@style/AppTheme.Button.Primary"
+                android:id="@+id/boosterAllOffButton"
+                style="@style/AppTheme.Button.Alert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/bring_margin"
+                android:layout_marginLeft="5dp"
                 android:layout_weight="1"
                 android:text="All off" />
 
@@ -36,23 +37,25 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/booster0"
                 style="@style/AppTheme.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/bring_margin"
                 android:layout_weight="1"
                 android:text="Booster 1" />
 
             <Button
+                android:id="@+id/booster1"
                 style="@style/AppTheme.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/bring_margin"
+                android:layout_marginLeft="5dp"
                 android:layout_weight="1"
-                android:text="Booster 1" />
+                android:text="Booster 2" />
 
 
         </LinearLayout>
@@ -60,21 +63,23 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/booster2"
                 style="@style/AppTheme.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/bring_margin"
                 android:layout_weight="1"
                 android:text="Booster 3" />
 
             <Button
+                android:id="@+id/booster3"
                 style="@style/AppTheme.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/bring_margin"
+                android:layout_marginLeft="5dp"
                 android:layout_weight="1"
                 android:text="Booster 4" />
 
@@ -83,21 +88,23 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/booster4"
                 style="@style/AppTheme.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/bring_margin"
                 android:layout_weight="1"
                 android:text="Booster 5" />
 
             <Button
+                android:id="@+id/booster5"
                 style="@style/AppTheme.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/bring_margin"
+                android:layout_marginLeft="5dp"
                 android:layout_weight="1"
                 android:text="Booster 6" />
 
@@ -106,21 +113,23 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/booster6"
                 style="@style/AppTheme.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/bring_margin"
                 android:layout_weight="1"
                 android:text="Booster 7" />
 
             <Button
+                android:id="@+id/booster7"
                 style="@style/AppTheme.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/bring_margin"
+                android:layout_marginLeft="5dp"
                 android:layout_weight="1"
                 android:text="Booster 8" />
 
