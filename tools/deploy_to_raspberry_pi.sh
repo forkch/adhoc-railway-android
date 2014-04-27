@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./gradlew --offline clean assemble
+./gradlew --offline assembleDebug
 FILE=AdHoc-Railway/build/apk/*.apk
 ssh baehnle@adhocserver 'rm -rf /var/www/adhoc-railway/artifacts-android && mkdir /var/www/adhoc-railway/artifacts-android'
 
