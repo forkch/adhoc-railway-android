@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="10dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/adhoc_railway_128" />
 
     <Button
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
         android:text="Connect" />
 
     <ProgressBar
@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="15dp"
         android:indeterminate="true"
         android:visibility="visible" />
 

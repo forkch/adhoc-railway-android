@@ -30,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:gravity="center_vertical"
             android:padding="5dp"
             android:text="Ae 621"
             android:textColor="@color/bring_gray_dark"
