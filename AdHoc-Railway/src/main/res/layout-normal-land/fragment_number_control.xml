@@ -211,16 +211,6 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/turnoutButton0"
-                style="@style/AppTheme.Button.Secondary"
-                android:layout_width="@dimen/numberButtonWidth"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="0"
-                android:textSize="@dimen/number_button_text_size"
-                android:textStyle="bold" />
-
-            <Button
                 android:id="@+id/turnoutButtonPeriod"
                 style="@style/AppTheme.Button.Primary"
                 android:layout_width="@dimen/numberButtonWidth"
@@ -230,6 +220,17 @@
                 android:text="."
                 android:textSize="@dimen/number_button_text_size"
                 android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/turnoutButton0"
+                style="@style/AppTheme.Button.Secondary"
+                android:layout_width="@dimen/numberButtonWidth"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="0"
+                android:textSize="@dimen/number_button_text_size"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
     </LinearLayout>
