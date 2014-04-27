@@ -130,7 +130,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     private void connectToDummySrcpService() {
         turnoutController = new DummyTurnoutController();
-        routeController = new DummyRouteController(turnoutController);
+        routeController = new DummyRouteController(turnoutController, turnoutManager);
         locomotiveController = new DummyLocomotiveController();
         powerController = new DummyPowerController();
         handler.post(new Runnable() {
@@ -156,7 +156,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
                     session.connect();
 
                     SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter();
-                    SRCPRouteControlAdapter srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter);
+                    SRCPRouteControlAdapter srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter, turnoutManager);
                     SRCPLocomotiveControlAdapter srcpLocomotiveControlAdapter = new SRCPLocomotiveControlAdapter();
                     SRCPPowerControlAdapter srcpPowerControlAdapter = new SRCPPowerControlAdapter();
 
