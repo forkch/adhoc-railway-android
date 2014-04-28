@@ -10,5 +10,11 @@
     <string name="pref_title_useDummyServices">Use Dummy Services</string>
     <string name="pref_default_useDummyServices">false</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="error_connection_adhocserver">Failed to connect to AdHoc-Server</string>
+    <string name="error_load_xml">Failed to load XML</string>
+    <string name="error_communication_adhocserver">Communication error with AdHoc-Server</string>
+    <string name="info_disconnected_from_adhocserver">Disconnected from AdHoc-Server</string>
+    <string name="info_disconnected_to_adhocserver">Connected to AdHoc-Server</string>
+    <string name="error_failed_to_connect_srcpserver">Failed to connect to SRCP server</string>
 
 </resources>

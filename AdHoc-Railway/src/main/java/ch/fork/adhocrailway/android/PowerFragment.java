@@ -9,12 +9,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import ch.fork.AdHocRailway.controllers.PowerController;
+import com.google.common.collect.Lists;
 
-public class PowerFragment extends Fragment {
+import java.util.List;
+
+import ch.fork.AdHocRailway.controllers.PowerChangeListener;
+import ch.fork.AdHocRailway.controllers.PowerController;
+import ch.fork.AdHocRailway.model.power.Booster;
+import ch.fork.AdHocRailway.model.power.BoosterState;
+import ch.fork.AdHocRailway.model.power.PowerSupply;
+
+public class PowerFragment extends Fragment implements PowerChangeListener {
     private OnPowerFragmentInteractionListener mListener;
     private View fragmentView;
     private AdHocRailwayApplication adHocRailwayApplication;
+    private List<Button> boosterButtons = Lists.newArrayList();
 
 
     public PowerFragment() {
@@ -48,6 +57,7 @@ public class PowerFragment extends Fragment {
         for (int i = 0; i < 8; i++) {
             Button boosterButton = (Button) fragmentView.findViewById(getResources().getIdentifier("booster" + i, "id", getActivity().getPackageName()));
             boosterButton.setOnClickListener(new BoosterButtonListener(i));
+            boosterButtons.add(boosterButton);
         }
 
         Button boosterAllOnButton = (Button) fragmentView.findViewById(R.id.boosterAllOnButton);
@@ -72,14 +82,27 @@ public class PowerFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         adHocRailwayApplication = (AdHocRailwayApplication) getActivity().getApplication();
+        adHocRailwayApplication.getPowerController().addPowerChangeListener(this);
+        powerChanged(adHocRailwayApplication.getPowerController().getPowerSupply(1));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void powerChanged(PowerSupply supply) {
+        for (Booster booster : supply.getBoosters()) {
+            Button button = boosterButtons.get(booster.getBoosterNumber());
+            if (booster.getState() == BoosterState.ACTIVE) {
+                button.setBackgroundResource(R.drawable.bring_button_primary);
+            } else {
+                button.setBackgroundResource(R.drawable.bring_button_alert);
+            }
+        }
     }
 
     public interface OnPowerFragmentInteractionListener {
