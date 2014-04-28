@@ -44,6 +44,10 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
     private NumberControlState numberControlState = NumberControlState.TURNOUT;
     private TextView routeIndicator;
     private Deque<Object> previousChangedObjects = new ArrayDeque<Object>();
+    private SeekBar locomotive1Seekbar;
+    private Button directionButton;
+    private Button stopButton;
+    private Button emergencyStopButton;
 
     public MainControllerFragment() {
     }
@@ -134,16 +138,16 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         selectedLocomotiveView.setOnClickListener(new SelectLocomotiveListener());
 
-        SeekBar locomotive1Seekbar = (SeekBar) fragmentView.findViewById(R.id.locomotive1Speed);
+        locomotive1Seekbar = (SeekBar) fragmentView.findViewById(R.id.locomotive1Speed);
         locomotive1Seekbar.setOnSeekBarChangeListener(new Locomotive1SpeedListener());
 
-        Button directionButton = (Button) fragmentView.findViewById(R.id.locomotive1Direction);
+        directionButton = (Button) fragmentView.findViewById(R.id.locomotive1Direction);
         directionButton.setOnClickListener(new Locomotive1DirectionListener());
 
-        Button stopButton = (Button) fragmentView.findViewById(R.id.locomotive1Stop);
+        stopButton = (Button) fragmentView.findViewById(R.id.locomotive1Stop);
         stopButton.setOnClickListener(new Locomotive1StopListener());
 
-        Button emergencyStopButton = (Button) fragmentView.findViewById(R.id.locomotiveEmergencyStop);
+        emergencyStopButton = (Button) fragmentView.findViewById(R.id.locomotiveEmergencyStop);
         emergencyStopButton.setOnClickListener(new EmergencyStopListener());
 
         for (int i = 0; i < 5; i++) {
@@ -153,7 +157,6 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                 functionButton.setOnClickListener(new FunctionButtonClickListener(i));
             }
         }
-
     }
 
     private void updateSelectedLocomotive() {
@@ -269,6 +272,7 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                 @Override
                 protected Void doInBackground(Void... params) {
                     adHocRailwayApplication.getLocomotiveController().emergencyStop(selectedLocomotive);
+                    locomotive1Seekbar.setProgress(0);
                     return null;
                 }
             };
@@ -333,6 +337,7 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                 @Override
                 protected Void doInBackground(Void... params) {
                     adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, 0, selectedLocomotive.getCurrentFunctions());
+                    locomotive1Seekbar.setProgress(0);
                     return null;
                 }
             };
