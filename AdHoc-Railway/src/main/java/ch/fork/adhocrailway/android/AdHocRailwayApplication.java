@@ -56,6 +56,8 @@ import ch.fork.AdHocRailway.railway.srcp.SRCPRouteControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 import ch.fork.AdHocRailway.services.AdHocServiceException;
 import ch.fork.AdHocRailway.services.LocomotiveServiceListener;
+import ch.fork.adhocrailway.android.events.ExceptionEvent;
+import ch.fork.adhocrailway.android.events.InfoEvent;
 import de.dermoba.srcp.client.SRCPSession;
 import de.dermoba.srcp.common.exception.SRCPException;
 import timber.log.Timber;
@@ -176,20 +178,10 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
                     routeController = srcpRouteControlAdapter;
                     powerController = srcpPowerControlAdapter;
 
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            bus.post(new ConnectedToRailwayDeviceEvent(true));
-                        }
-                    });
+                    postEvent(new ConnectedToRailwayDeviceEvent(true));
                 } catch (SRCPException e) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            bus.post(new ConnectedToRailwayDeviceEvent(false));
-
-                        }
-                    });
+                    postEvent(new ExceptionEvent(getString(R.string.error_failed_to_connect_srcpserver), e));
+                    postEvent(new ConnectedToRailwayDeviceEvent(false));
                 }
                 return null;
             }
@@ -240,7 +232,8 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    postEvent(new ExceptionEvent(getString(R.string.error_load_xml), e));
+
                 }
                 return null;
             }
@@ -332,6 +325,23 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     }
 
     @Override
+    public void locomotivesUpdated(final SortedSet<LocomotiveGroup> locomotiveGroups) {
+        Log.i(TAG, String.valueOf(locomotiveGroups));
+        setLocomotiveGroups(locomotiveGroups);
+        postEvent(new LocomotivesUpdatedEvent(locomotiveGroups));
+    }
+
+    @Override
+    public void turnoutsUpdated(final SortedSet<TurnoutGroup> turnoutGroups) {
+        postEvent(new TurnoutsUpdatedEvent(turnoutGroups));
+    }
+
+    @Override
+    public void routesUpdated(final SortedSet<RouteGroup> allRouteGroups) {
+        postEvent(new RoutesUpdatedEvent(allRouteGroups));
+    }
+
+    @Override
     public void locomotiveAdded(Locomotive locomotive) {
         Log.i(TAG, String.valueOf(locomotive));
     }
@@ -343,7 +353,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     @Override
     public void locomotiveRemoved(Locomotive locomotive) {
-
         Log.i(TAG, String.valueOf(locomotive));
     }
 
@@ -365,29 +374,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         Log.i(TAG, String.valueOf(group));
     }
 
-    @Override
-    public void locomotivesUpdated(final SortedSet<LocomotiveGroup> locomotiveGroups) {
-        Log.i(TAG, String.valueOf(locomotiveGroups));
-        setLocomotiveGroups(locomotiveGroups);
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                bus.post(new LocomotivesUpdatedEvent(locomotiveGroups));
-
-            }
-        });
-    }
-
-    @Override
-    public void turnoutsUpdated(final SortedSet<TurnoutGroup> turnoutGroups) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                bus.post(new TurnoutsUpdatedEvent(turnoutGroups));
-
-            }
-        });
-    }
 
     @Override
     public void turnoutAdded(Turnout turnout) {
@@ -419,16 +405,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     }
 
-    @Override
-    public void routesUpdated(final SortedSet<RouteGroup> allRouteGroups) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                bus.post(new RoutesUpdatedEvent(allRouteGroups));
-
-            }
-        });
-    }
 
     @Override
     public void routeRemoved(Route route) {
@@ -462,24 +438,36 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     @Override
     public void failure(AdHocServiceException arg0) {
-        Log.e("", "error");
+        Log.e(TAG, "failure in communication with adhocserver", arg0);
+        postEvent(new ExceptionEvent(getString(R.string.error_communication_adhocserver), arg0));
     }
 
     @Override
     public void connected() {
-        Log.i(TAG, "connected");
+        Log.i(TAG, "connected to adhocserver");
+        postEvent(new InfoEvent(getString(R.string.info_disconnected_to_adhocserver)));
     }
 
     @Override
     public void connectionError(AdHocServiceException ex) {
-
-        Log.e("", "error");
+        Log.e(TAG, "failed to connect to adhocserver", ex);
+        postEvent(new ExceptionEvent(getString(R.string.error_connection_adhocserver), ex));
     }
 
     @Override
     public void disconnected() {
+        Log.i(TAG, "disconnected from adhocserver");
+        postEvent(new InfoEvent(getString(R.string.info_disconnected_from_adhocserver)));
+    }
 
-        Log.i(TAG, "disconnected");
+
+    private void postEvent(final Object event) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                bus.post(event);
+            }
+        });
     }
 
 

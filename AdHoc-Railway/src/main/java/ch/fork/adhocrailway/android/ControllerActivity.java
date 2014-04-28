@@ -11,9 +11,14 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
+import com.google.common.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ch.fork.adhocrailway.android.events.InfoEvent;
 
 public class ControllerActivity extends FragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener, PowerFragment.OnPowerFragmentInteractionListener {
 
@@ -42,8 +47,14 @@ public class ControllerActivity extends FragmentActivity implements MainControll
     protected void onResume() {
         super.onResume();
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
+        adHocRailwayApplication.getBus().register(this);
         onLocomotiveSelected();
 
+    }
+
+    @Override
+    protected void onStop() {
+        adHocRailwayApplication.getBus().unregister(this);
     }
 
     @Override
@@ -81,6 +92,10 @@ public class ControllerActivity extends FragmentActivity implements MainControll
         return super.onOptionsItemSelected(item);
     }
 
+    @Subscribe
+    public void onInfonEvent(InfoEvent event) {
+        Toast.makeText(this, event.getMessage(), Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onLocomotiveSelected() {

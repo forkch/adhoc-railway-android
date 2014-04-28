@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 
@@ -20,6 +21,8 @@ import butterknife.InjectView;
 import ch.fork.AdHocRailway.manager.impl.events.LocomotivesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.RoutesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
+import ch.fork.adhocrailway.android.events.ExceptionEvent;
+import ch.fork.adhocrailway.android.events.InfoEvent;
 
 public class ConnectActivity extends Activity {
 
@@ -83,15 +86,24 @@ public class ConnectActivity extends Activity {
         });
     }
 
+    @Subscribe
+    public void onExceptionEvent(ExceptionEvent event) {
+        Toast.makeText(this, event.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Subscribe
+    public void onInfonEvent(InfoEvent event) {
+        Toast.makeText(this, event.getMessage(), Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     protected void onStart() {
         super.onStart();
-        adHocRailwayApplication.getBus().register(this);
     }
     @Override
     protected void onResume() {
         super.onResume();
+        adHocRailwayApplication.getBus().register(this);
         initValues();
         locomotivesLoaded = false;
         turnoutsLoaded = false;
