@@ -56,6 +56,8 @@ import ch.fork.AdHocRailway.railway.srcp.SRCPRouteControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 import ch.fork.AdHocRailway.services.AdHocServiceException;
 import ch.fork.AdHocRailway.services.LocomotiveServiceListener;
+import ch.fork.adhocrailway.android.activities.SettingsActivity;
+import ch.fork.adhocrailway.android.events.ConnectedToRailwayDeviceEvent;
 import ch.fork.adhocrailway.android.events.ExceptionEvent;
 import ch.fork.adhocrailway.android.events.InfoEvent;
 import de.dermoba.srcp.client.SRCPSession;
@@ -326,114 +328,114 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     @Override
     public void locomotivesUpdated(final SortedSet<LocomotiveGroup> locomotiveGroups) {
-        Log.i(TAG, String.valueOf(locomotiveGroups));
+        Log.i(TAG, "locomotives updated");
         setLocomotiveGroups(locomotiveGroups);
         postEvent(new LocomotivesUpdatedEvent(locomotiveGroups));
     }
 
     @Override
     public void turnoutsUpdated(final SortedSet<TurnoutGroup> turnoutGroups) {
+        Log.i(TAG, "turnouts updated");
         postEvent(new TurnoutsUpdatedEvent(turnoutGroups));
     }
 
     @Override
     public void routesUpdated(final SortedSet<RouteGroup> allRouteGroups) {
+        Log.i(TAG, "routes updated");
         postEvent(new RoutesUpdatedEvent(allRouteGroups));
     }
 
     @Override
     public void locomotiveAdded(Locomotive locomotive) {
-        Log.i(TAG, String.valueOf(locomotive));
+        Log.i(TAG, "locomotive added: " + String.valueOf(locomotive));
     }
 
     @Override
     public void locomotiveUpdated(Locomotive locomotive) {
-        Log.i(TAG, String.valueOf(locomotive));
+        Log.i(TAG, "locomotive updated: " + String.valueOf(locomotive));
     }
 
     @Override
     public void locomotiveRemoved(Locomotive locomotive) {
-        Log.i(TAG, String.valueOf(locomotive));
+        Log.i(TAG, "locomotive removed: " + String.valueOf(locomotive));
     }
 
     @Override
     public void locomotiveGroupAdded(LocomotiveGroup group) {
-
-        Log.i(TAG, String.valueOf(group));
+        Log.i(TAG, "locomotive group added: " + group);
     }
 
     @Override
     public void locomotiveGroupUpdated(LocomotiveGroup group) {
-
-        Log.i(TAG, String.valueOf(group));
+        Log.i(TAG, "locomotive group updated: " + group);
     }
 
     @Override
     public void locomotiveGroupRemoved(LocomotiveGroup group) {
-
-        Log.i(TAG, String.valueOf(group));
+        Log.i(TAG, "locomotive group removed: " + group);
     }
 
 
     @Override
     public void turnoutAdded(Turnout turnout) {
-
+        Log.i(TAG, "turnout added: " + turnout);
     }
 
     @Override
     public void turnoutUpdated(Turnout turnout) {
-
+        Log.i(TAG, "turnout updated: " + turnout);
     }
 
     @Override
     public void turnoutRemoved(Turnout turnout) {
-
+        Log.i(TAG, "turnout removed: " + turnout);
     }
 
     @Override
     public void turnoutGroupAdded(TurnoutGroup group) {
-
+        Log.i(TAG, "turnout group added: " + group);
     }
 
     @Override
     public void turnoutGroupUpdated(TurnoutGroup group) {
-
+        Log.i(TAG, "turnout group updated: " + group);
     }
 
     @Override
     public void turnoutGroupRemoved(TurnoutGroup group) {
-
-    }
-
-
-    @Override
-    public void routeRemoved(Route route) {
-
+        Log.i(TAG, "turnout group removed: " + group);
     }
 
     @Override
     public void routeAdded(Route route) {
-
+        Log.i(TAG, "route added: " + route);
     }
 
     @Override
     public void routeUpdated(Route route) {
-
+        Log.i(TAG, "route updated: " + route);
     }
 
     @Override
+    public void routeRemoved(Route route) {
+        Log.i(TAG, "route removed: " + route);
+    }
+
+
+    @Override
     public void routeGroupAdded(RouteGroup routeGroup) {
+        Log.i(TAG, "route group added: " + routeGroup);
 
     }
 
     @Override
     public void routeGroupRemoved(RouteGroup routeGroup) {
-
+        Log.i(TAG, "route group removed: " + routeGroup);
     }
 
     @Override
     public void routeGroupUpdated(RouteGroup routeGroup) {
-
+        Log.i(TAG, "route group updated: " + routeGroup);
     }
 
     @Override

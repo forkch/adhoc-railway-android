@@ -1,4 +1,4 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.utils;
 
 import android.os.Environment;
 

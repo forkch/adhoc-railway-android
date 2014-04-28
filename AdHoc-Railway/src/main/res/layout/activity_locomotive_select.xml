@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/bring_padding"
-    tools:context="ch.fork.adhocrailway.android.LocomotiveSelectActivity">
+    tools:context="ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity">
 
     <ListView
         android:id="@android:id/list"

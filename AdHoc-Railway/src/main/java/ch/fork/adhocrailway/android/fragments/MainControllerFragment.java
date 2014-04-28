@@ -1,4 +1,4 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -29,6 +29,11 @@ import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.turnouts.Route;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
+import ch.fork.adhocrailway.android.AdHocRailwayApplication;
+import ch.fork.adhocrailway.android.R;
+import ch.fork.adhocrailway.android.activities.ControllerActivity;
+import ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity;
+import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 
 public class MainControllerFragment extends Fragment implements NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener {

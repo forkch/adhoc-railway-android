@@ -1,4 +1,4 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,6 +21,9 @@ import butterknife.InjectView;
 import ch.fork.AdHocRailway.manager.impl.events.LocomotivesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.RoutesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
+import ch.fork.adhocrailway.android.AdHocRailwayApplication;
+import ch.fork.adhocrailway.android.R;
+import ch.fork.adhocrailway.android.events.ConnectedToRailwayDeviceEvent;
 import ch.fork.adhocrailway.android.events.ExceptionEvent;
 import ch.fork.adhocrailway.android.events.InfoEvent;
 

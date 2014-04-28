@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ch.fork.adhocrailway.android.ConnectActivity">
+    tools:context="ch.fork.adhocrailway.android.activities.ConnectActivity">
 
     <item
         android:id="@+id/action_settings"

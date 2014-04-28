@@ -1,4 +1,4 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,7 +18,13 @@ import com.google.common.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.fork.adhocrailway.android.AdHocRailwayApplication;
+import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.events.InfoEvent;
+import ch.fork.adhocrailway.android.fragments.LocomotiveControlFragment;
+import ch.fork.adhocrailway.android.fragments.MainControllerFragment;
+import ch.fork.adhocrailway.android.fragments.NumberControlFragment;
+import ch.fork.adhocrailway.android.fragments.PowerFragment;
 
 public class ControllerActivity extends FragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener, PowerFragment.OnPowerFragmentInteractionListener {
 

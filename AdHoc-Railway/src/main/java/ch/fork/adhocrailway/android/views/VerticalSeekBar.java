@@ -1,4 +1,4 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.views;
 
 import android.content.Context;
 import android.graphics.Canvas;

@@ -1,7 +1,9 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.activities;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
+import ch.fork.adhocrailway.android.fragments.SettingsFragment;
 
 /**
  * Created by fork on 4/24/14.

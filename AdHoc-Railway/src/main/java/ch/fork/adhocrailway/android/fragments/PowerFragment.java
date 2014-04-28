@@ -1,4 +1,4 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.fragments;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -18,6 +18,8 @@ import ch.fork.AdHocRailway.controllers.PowerController;
 import ch.fork.AdHocRailway.model.power.Booster;
 import ch.fork.AdHocRailway.model.power.BoosterState;
 import ch.fork.AdHocRailway.model.power.PowerSupply;
+import ch.fork.adhocrailway.android.AdHocRailwayApplication;
+import ch.fork.adhocrailway.android.R;
 
 public class PowerFragment extends Fragment implements PowerChangeListener {
     private OnPowerFragmentInteractionListener mListener;

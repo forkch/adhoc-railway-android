@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.fork.adhocrailway.android.LocomotiveControlFragment">
+    tools:context="ch.fork.adhocrailway.android.fragments.LocomotiveControlFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -94,7 +94,7 @@
 
             </LinearLayout>
 
-            <ch.fork.adhocrailway.android.VerticalSeekBar
+            <ch.fork.adhocrailway.android.views.VerticalSeekBar
                 android:id="@+id/locomotive1Speed"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"

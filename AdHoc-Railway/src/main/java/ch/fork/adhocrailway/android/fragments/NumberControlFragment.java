@@ -1,4 +1,4 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.fragments;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -17,6 +17,9 @@ import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.model.turnouts.Route;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
+import ch.fork.adhocrailway.android.AdHocRailwayApplication;
+import ch.fork.adhocrailway.android.R;
+import ch.fork.adhocrailway.android.activities.ControllerActivity;
 
 
 /**
@@ -229,6 +232,7 @@ public class NumberControlFragment extends Fragment {
 
             turnoutController.setCurvedLeft(turnout);
         }
+
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
         }

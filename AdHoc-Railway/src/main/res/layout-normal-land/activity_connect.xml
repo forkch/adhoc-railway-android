@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="@dimen/bring_margin"
-    tools:context="ch.fork.adhocrailway.android.ConnectActivity">
+    tools:context="ch.fork.adhocrailway.android.activities.ConnectActivity">
 
     <TextView
         android:id="@+id/welcome_title"
