@@ -61,6 +61,7 @@ public class ControllerActivity extends FragmentActivity implements MainControll
     @Override
     protected void onStop() {
         adHocRailwayApplication.getBus().unregister(this);
+        super.onStop();
     }
 
     @Override
