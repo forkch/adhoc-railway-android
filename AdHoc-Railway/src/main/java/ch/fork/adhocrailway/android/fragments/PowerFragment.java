@@ -97,6 +97,9 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
 
     @Override
     public void powerChanged(PowerSupply supply) {
+        if (supply == null) {
+            return;
+        }
         for (Booster booster : supply.getBoosters()) {
             Button button = boosterButtons.get(booster.getBoosterNumber());
             if (booster.getState() == BoosterState.ACTIVE) {
