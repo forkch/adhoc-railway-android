@@ -79,61 +79,68 @@
                 android:text="Stop" />
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:id="@+id/functionContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/locomotive1F0"
-                    style="@style/AppTheme.Button.Primary"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="Fn" />
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/locomotive1F1"
-                    style="@style/AppTheme.Button.Primary"
-                    android:layout_width="wrap_content"
+                    <Button
+                        android:id="@+id/locomotive1F0"
+                        style="@style/AppTheme.Button.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Fn" />
+
+                    <Button
+                        android:id="@+id/locomotive1F1"
+                        style="@style/AppTheme.Button.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:padding="5dp"
+                        android:text="F1" />
+
+                    <Button
+                        android:id="@+id/locomotive1F2"
+                        style="@style/AppTheme.Button.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:padding="5dp"
+                        android:text="F2" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:padding="5dp"
-                    android:text="F1" />
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/locomotive1F2"
-                    style="@style/AppTheme.Button.Primary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:padding="5dp"
-                    android:text="F2" />
-            </LinearLayout>
+                    <Button
+                        android:id="@+id/locomotive1F3"
+                        style="@style/AppTheme.Button.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="F3" />
 
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/locomotive1F4"
+                        style="@style/AppTheme.Button.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:padding="5dp"
+                        android:text="F4" />
 
-                <Button
-                    android:id="@+id/locomotive1F3"
-                    style="@style/AppTheme.Button.Primary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="F3" />
-
-                <Button
-                    android:id="@+id/locomotive1F4"
-                    style="@style/AppTheme.Button.Primary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:padding="5dp"
-                    android:text="F4" />
-
+                </LinearLayout>
             </LinearLayout>
 
             <Button

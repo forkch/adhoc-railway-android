@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import ch.fork.AdHocRailway.controllers.LocomotiveController;
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
@@ -38,21 +40,27 @@ import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 public class MainControllerFragment extends Fragment implements NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener {
 
+    LinearLayout functionContainer;
+    @InjectView(R.id.locomotive1Speed)
+    SeekBar locomotive1Seekbar;
+    @InjectView(R.id.locomotive1Direction)
+    Button directionButton;
+    @InjectView(R.id.locomotive1Stop)
+    Button stopButton;
+    @InjectView(R.id.locomotiveEmergencyStop)
+    Button emergencyStopButton;
+    @InjectView(R.id.selectedLocomotive)
+    LinearLayout selectedLocomotiveView;
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
     private int number;
     private AdHocRailwayApplication adHocRailwayApplication;
     private Locomotive selectedLocomotive;
-    private LinearLayout selectedLocomotiveView;
     private StringBuffer enteredNumberKeys = new StringBuffer();
     private TextView currentNumber;
     private NumberControlState numberControlState = NumberControlState.TURNOUT;
     private TextView routeIndicator;
     private Deque<Object> previousChangedObjects = new ArrayDeque<Object>();
-    private SeekBar locomotive1Seekbar;
-    private Button directionButton;
-    private Button stopButton;
-    private Button emergencyStopButton;
 
     public MainControllerFragment() {
     }
@@ -86,10 +94,10 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fragmentView = inflater.inflate(R.layout.fragment_main_controller, container, false);
+        ButterKnife.inject(this, fragmentView);
         currentNumber = (TextView) fragmentView.findViewById(R.id.currentNumber);
         routeIndicator = (TextView) fragmentView.findViewById(R.id.routeIndicator);
 
-        selectedLocomotiveView = (LinearLayout) fragmentView.findViewById(R.id.selectedLocomotive);
         initNumberControlEventHandling();
         initLocomotiveEventHandling();
 
@@ -143,23 +151,23 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         selectedLocomotiveView.setOnClickListener(new SelectLocomotiveListener());
 
-        locomotive1Seekbar = (SeekBar) fragmentView.findViewById(R.id.locomotive1Speed);
         locomotive1Seekbar.setOnSeekBarChangeListener(new Locomotive1SpeedListener());
 
-        directionButton = (Button) fragmentView.findViewById(R.id.locomotive1Direction);
         directionButton.setOnClickListener(new Locomotive1DirectionListener());
 
-        stopButton = (Button) fragmentView.findViewById(R.id.locomotive1Stop);
         stopButton.setOnClickListener(new Locomotive1StopListener());
 
-        emergencyStopButton = (Button) fragmentView.findViewById(R.id.locomotiveEmergencyStop);
         emergencyStopButton.setOnClickListener(new EmergencyStopListener());
 
-        for (int i = 0; i < 5; i++) {
-            Button functionButton = (Button) fragmentView.findViewById(getResources().getIdentifier("locomotive1F" + i, "id", getActivity().getPackageName()));
-            if (functionButton != null) {
-                //some layout have no function buttons
-                functionButton.setOnClickListener(new FunctionButtonClickListener(i));
+        functionContainer = (LinearLayout) fragmentView.findViewById(R.id.functionContainer);
+
+        if (functionContainer != null) {
+            for (int i = 0; i < 5; i++) {
+                Button functionButton = (Button) fragmentView.findViewById(getResources().getIdentifier("locomotive1F" + i, "id", getActivity().getPackageName()));
+                if (functionButton != null) {
+                    //some layout have no function buttons
+                    functionButton.setOnClickListener(new FunctionButtonClickListener(i));
+                }
             }
         }
     }

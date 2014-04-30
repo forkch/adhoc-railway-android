@@ -15,6 +15,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.R;
@@ -23,12 +25,24 @@ import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 
 public class LocomotiveControlFragment extends Fragment {
+    @InjectView(R.id.functionContainer)
+    LinearLayout functionContainer;
+    @InjectView(R.id.locomotive1Speed)
+    SeekBar locomotive1Seekbar;
+    @InjectView(R.id.locomotive1Direction)
+    Button directionButton;
+    @InjectView(R.id.locomotive1Stop)
+    Button stopButton;
+    @InjectView(R.id.locomotiveEmergencyStop)
+    Button emergencyStopButton;
+    @InjectView(R.id.selectedLocomotive)
+    LinearLayout selectedLocomotiveView;
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
     private AdHocRailwayApplication adHocRailwayApplication;
     private int number;
     private Locomotive selectedLocomotive;
-    private LinearLayout selectedLocomotiveView;
+
 
     public LocomotiveControlFragment() {
         // Required empty public constructor
@@ -62,8 +76,8 @@ public class LocomotiveControlFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fragmentView = inflater.inflate(R.layout.fragment_locomotive_control, container, false);
+        ButterKnife.inject(this, fragmentView);
 
-        selectedLocomotiveView = (LinearLayout) fragmentView.findViewById(R.id.selectedLocomotive);
         initEventHandling();
 
         return fragmentView;
@@ -74,16 +88,12 @@ public class LocomotiveControlFragment extends Fragment {
 
         selectedLocomotiveView.setOnClickListener(new SelectLocomotiveListener());
 
-        SeekBar locomotive1Seekbar = (SeekBar) fragmentView.findViewById(R.id.locomotive1Speed);
         locomotive1Seekbar.setOnSeekBarChangeListener(new Locomotive1SpeedListener());
 
-        Button directionButton = (Button) fragmentView.findViewById(R.id.locomotive1Direction);
         directionButton.setOnClickListener(new Locomotive1DirectionListener());
 
-        Button stopButton = (Button) fragmentView.findViewById(R.id.locomotive1Stop);
         stopButton.setOnClickListener(new Locomotive1StopListener());
 
-        Button emergencyStopButton = (Button) fragmentView.findViewById(R.id.locomotiveEmergencyStop);
         emergencyStopButton.setOnClickListener(new EmergencyStopListener());
 
     }
