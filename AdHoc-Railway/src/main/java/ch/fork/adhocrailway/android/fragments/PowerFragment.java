@@ -96,18 +96,25 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
     }
 
     @Override
-    public void powerChanged(PowerSupply supply) {
-        if (supply == null) {
-            return;
-        }
-        for (Booster booster : supply.getBoosters()) {
-            Button button = boosterButtons.get(booster.getBoosterNumber());
-            if (booster.getState() == BoosterState.ACTIVE) {
-                button.setBackgroundResource(R.drawable.bring_button_primary);
-            } else {
-                button.setBackgroundResource(R.drawable.bring_button_alert);
+    public void powerChanged(final PowerSupply supply) {
+        fragmentView.post(new Runnable() {
+            @Override
+            public void run() {
+
+                if (supply == null) {
+                    return;
+                }
+                for (Booster booster : supply.getBoosters()) {
+                    Button button = boosterButtons.get(booster.getBoosterNumber());
+                    if (booster.getState() == BoosterState.ACTIVE) {
+                        button.setBackgroundResource(R.drawable.bring_button_primary);
+                    } else {
+                        button.setBackgroundResource(R.drawable.bring_button_alert);
+                    }
+                }
             }
-        }
+        });
+
     }
 
     public interface OnPowerFragmentInteractionListener {
