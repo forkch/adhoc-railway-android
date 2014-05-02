@@ -396,7 +396,7 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         protected abstract void doPerformStateAction(RouteController routeController, Route routeByNumber);
 
         protected void storePreviousChangedObject(Object obj) {
-            previousChangedObjects.addFirst(obj);
+            previousChangedObjects.addLast(obj);
             updatePreviousChangedObject();
         }
 
