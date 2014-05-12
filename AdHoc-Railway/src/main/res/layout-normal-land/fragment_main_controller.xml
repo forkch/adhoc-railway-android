@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="@dimen/bring_margin"
     tools:context="${packageName}.${activityClass}">
 
@@ -10,22 +10,21 @@
         android:id="@+id/numberControlContainer"
         layout="@layout/fragment_number_control"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1" />
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="2dip"
-        android:layout_marginTop="@dimen/bring_margin"
+        android:layout_width="2dp"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="@dimen/bring_margin"
         android:background="@color/bring_gray" />
-
 
     <include
         android:id="@+id/locomotiveControlContainer"
         layout="@layout/fragment_locomotive_control"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/bring_margin" />
-
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/bring_margin"
+        android:layout_weight="1.8" />
 
 </LinearLayout>

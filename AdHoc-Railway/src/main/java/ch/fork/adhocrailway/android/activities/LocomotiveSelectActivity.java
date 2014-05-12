@@ -1,4 +1,4 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.activities;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -16,6 +16,9 @@ import java.util.TreeSet;
 
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
+import ch.fork.adhocrailway.android.AdHocRailwayApplication;
+import ch.fork.adhocrailway.android.R;
+import ch.fork.adhocrailway.android.adapters.LocomotiveListAdapter;
 
 
 public class LocomotiveSelectActivity extends ListActivity {

@@ -1,23 +1,18 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.lang.reflect.Array;
 import java.util.List;
 
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
+import ch.fork.adhocrailway.android.R;
+import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 /**
  * Created by fork on 4/16/14.

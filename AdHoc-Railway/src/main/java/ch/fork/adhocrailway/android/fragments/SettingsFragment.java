@@ -1,7 +1,9 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.fragments;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+
+import ch.fork.adhocrailway.android.R;
 
 /**
  * Created by fork on 4/24/14.

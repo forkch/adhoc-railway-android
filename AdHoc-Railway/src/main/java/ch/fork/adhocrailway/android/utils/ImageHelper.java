@@ -1,4 +1,4 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 public class ImageHelper {
     public static void fillImageViewFromBase64ImageString(ImageView imageView, String imageBase64) {
 
-        if(StringUtils.isNotBlank(imageBase64)) {
+        if (StringUtils.isNotBlank(imageBase64)) {
             byte[] decodedString = Base64.decode(imageBase64, Base64.DEFAULT);
             Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             imageView.setImageBitmap(decodedByte);

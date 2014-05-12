@@ -9,17 +9,17 @@ import android.util.Log;
 
 import com.squareup.otto.Bus;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.SortedSet;
 import java.util.UUID;
 
 import ch.fork.AdHocRailway.controllers.LocomotiveController;
+import ch.fork.AdHocRailway.controllers.PowerController;
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyLocomotiveController;
+import ch.fork.AdHocRailway.controllers.impl.dummy.DummyPowerController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyRouteController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyTurnoutController;
 import ch.fork.AdHocRailway.manager.LocomotiveManager;
@@ -36,6 +36,7 @@ import ch.fork.AdHocRailway.manager.impl.events.RoutesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
+import ch.fork.AdHocRailway.model.power.PowerSupply;
 import ch.fork.AdHocRailway.model.turnouts.Route;
 import ch.fork.AdHocRailway.model.turnouts.RouteGroup;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
@@ -50,10 +51,15 @@ import ch.fork.AdHocRailway.persistence.xml.impl.XMLLocomotiveService;
 import ch.fork.AdHocRailway.persistence.xml.impl.XMLRouteService;
 import ch.fork.AdHocRailway.persistence.xml.impl.XMLTurnoutService;
 import ch.fork.AdHocRailway.railway.srcp.SRCPLocomotiveControlAdapter;
+import ch.fork.AdHocRailway.railway.srcp.SRCPPowerControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPRouteControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 import ch.fork.AdHocRailway.services.AdHocServiceException;
 import ch.fork.AdHocRailway.services.LocomotiveServiceListener;
+import ch.fork.adhocrailway.android.activities.SettingsActivity;
+import ch.fork.adhocrailway.android.events.ConnectedToRailwayDeviceEvent;
+import ch.fork.adhocrailway.android.events.ExceptionEvent;
+import ch.fork.adhocrailway.android.events.InfoEvent;
 import de.dermoba.srcp.client.SRCPSession;
 import de.dermoba.srcp.common.exception.SRCPException;
 import timber.log.Timber;
@@ -71,6 +77,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     private LocomotiveController locomotiveController;
     private TurnoutController turnoutController;
     private RouteController routeController;
+    private PowerController powerController;
 
     private TurnoutManager turnoutManager;
     private RouteManager routeManager;
@@ -81,11 +88,12 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     private SRCPSession session;
     private String adhocServerHost;
     private String srcpServerHost;
+    private PowerSupply powerSupply;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        ConfigureLog4J.configure();
+        //ConfigureLog4J.configure();
         bus = new Bus();
         bus.register(this);
         handler = new Handler();
@@ -126,8 +134,9 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     private void connectToDummySrcpService() {
         turnoutController = new DummyTurnoutController();
-        routeController = new DummyRouteController(turnoutController);
+        routeController = new DummyRouteController(turnoutController, turnoutManager);
         locomotiveController = new DummyLocomotiveController();
+        powerController = new DummyPowerController();
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -151,31 +160,30 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
                     session.connect();
 
                     SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter();
-                    SRCPRouteControlAdapter srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter);
+                    SRCPRouteControlAdapter srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter, turnoutManager);
                     SRCPLocomotiveControlAdapter srcpLocomotiveControlAdapter = new SRCPLocomotiveControlAdapter();
+                    SRCPPowerControlAdapter srcpPowerControlAdapter = new SRCPPowerControlAdapter();
 
                     srcpTurnoutControlAdapter.setSession(session);
                     srcpRouteControlAdapter.setSession(session);
                     srcpLocomotiveControlAdapter.setSession(session);
+                    srcpPowerControlAdapter.setSession(session);
+
+                    powerSupply = new PowerSupply(1);
+                    srcpPowerControlAdapter.addOrUpdatePowerSupply(powerSupply);
+
+
+                    srcpRouteControlAdapter.setRoutingDelay(500);
 
                     locomotiveController = srcpLocomotiveControlAdapter;
                     turnoutController = srcpTurnoutControlAdapter;
                     routeController = srcpRouteControlAdapter;
+                    powerController = srcpPowerControlAdapter;
 
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            bus.post(new ConnectedToRailwayDeviceEvent(true));
-                        }
-                    });
+                    postEvent(new ConnectedToRailwayDeviceEvent(true));
                 } catch (SRCPException e) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            bus.post(new ConnectedToRailwayDeviceEvent(false));
-
-                        }
-                    });
+                    postEvent(new ExceptionEvent(getString(R.string.error_failed_to_connect_srcpserver), e));
+                    postEvent(new ConnectedToRailwayDeviceEvent(false));
                 }
                 return null;
             }
@@ -226,7 +234,8 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    postEvent(new ExceptionEvent(getString(R.string.error_load_xml), e));
+
                 }
                 return null;
             }
@@ -273,6 +282,10 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         return locomotiveController;
     }
 
+    public PowerController getPowerController() {
+        return powerController;
+    }
+
     public TurnoutManager getTurnoutManager() {
         return turnoutManager;
     }
@@ -285,6 +298,9 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         return locomotiveManager;
     }
 
+    public PowerSupply getPowerSupply() {
+        return powerSupply;
+    }
 
     public Bus getBus() {
         return bus;
@@ -311,154 +327,149 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     }
 
     @Override
-    public void locomotiveAdded(Locomotive locomotive) {
-        Log.i(TAG, String.valueOf(locomotive));
-    }
-
-    @Override
-    public void locomotiveUpdated(Locomotive locomotive) {
-        Log.i(TAG, String.valueOf(locomotive));
-    }
-
-    @Override
-    public void locomotiveRemoved(Locomotive locomotive) {
-
-        Log.i(TAG, String.valueOf(locomotive));
-    }
-
-    @Override
-    public void locomotiveGroupAdded(LocomotiveGroup group) {
-
-        Log.i(TAG, String.valueOf(group));
-    }
-
-    @Override
-    public void locomotiveGroupUpdated(LocomotiveGroup group) {
-
-        Log.i(TAG, String.valueOf(group));
-    }
-
-    @Override
-    public void locomotiveGroupRemoved(LocomotiveGroup group) {
-
-        Log.i(TAG, String.valueOf(group));
-    }
-
-    @Override
     public void locomotivesUpdated(final SortedSet<LocomotiveGroup> locomotiveGroups) {
-        Log.i(TAG, String.valueOf(locomotiveGroups));
+        Log.i(TAG, "locomotives updated");
         setLocomotiveGroups(locomotiveGroups);
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                bus.post(new LocomotivesUpdatedEvent(locomotiveGroups));
-
-            }
-        });
+        postEvent(new LocomotivesUpdatedEvent(locomotiveGroups));
     }
 
     @Override
     public void turnoutsUpdated(final SortedSet<TurnoutGroup> turnoutGroups) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                bus.post(new TurnoutsUpdatedEvent(turnoutGroups));
-
-            }
-        });
-    }
-
-    @Override
-    public void turnoutAdded(Turnout turnout) {
-
-    }
-
-    @Override
-    public void turnoutUpdated(Turnout turnout) {
-
-    }
-
-    @Override
-    public void turnoutRemoved(Turnout turnout) {
-
-    }
-
-    @Override
-    public void turnoutGroupAdded(TurnoutGroup group) {
-
-    }
-
-    @Override
-    public void turnoutGroupUpdated(TurnoutGroup group) {
-
-    }
-
-    @Override
-    public void turnoutGroupRemoved(TurnoutGroup group) {
-
+        Log.i(TAG, "turnouts updated");
+        postEvent(new TurnoutsUpdatedEvent(turnoutGroups));
     }
 
     @Override
     public void routesUpdated(final SortedSet<RouteGroup> allRouteGroups) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                bus.post(new RoutesUpdatedEvent(allRouteGroups));
-
-            }
-        });
+        Log.i(TAG, "routes updated");
+        postEvent(new RoutesUpdatedEvent(allRouteGroups));
     }
 
     @Override
-    public void routeRemoved(Route route) {
+    public void locomotiveAdded(Locomotive locomotive) {
+        Log.i(TAG, "locomotive added: " + String.valueOf(locomotive));
+    }
 
+    @Override
+    public void locomotiveUpdated(Locomotive locomotive) {
+        Log.i(TAG, "locomotive updated: " + String.valueOf(locomotive));
+    }
+
+    @Override
+    public void locomotiveRemoved(Locomotive locomotive) {
+        Log.i(TAG, "locomotive removed: " + String.valueOf(locomotive));
+    }
+
+    @Override
+    public void locomotiveGroupAdded(LocomotiveGroup group) {
+        Log.i(TAG, "locomotive group added: " + group);
+    }
+
+    @Override
+    public void locomotiveGroupUpdated(LocomotiveGroup group) {
+        Log.i(TAG, "locomotive group updated: " + group);
+    }
+
+    @Override
+    public void locomotiveGroupRemoved(LocomotiveGroup group) {
+        Log.i(TAG, "locomotive group removed: " + group);
+    }
+
+
+    @Override
+    public void turnoutAdded(Turnout turnout) {
+        Log.i(TAG, "turnout added: " + turnout);
+    }
+
+    @Override
+    public void turnoutUpdated(Turnout turnout) {
+        Log.i(TAG, "turnout updated: " + turnout);
+    }
+
+    @Override
+    public void turnoutRemoved(Turnout turnout) {
+        Log.i(TAG, "turnout removed: " + turnout);
+    }
+
+    @Override
+    public void turnoutGroupAdded(TurnoutGroup group) {
+        Log.i(TAG, "turnout group added: " + group);
+    }
+
+    @Override
+    public void turnoutGroupUpdated(TurnoutGroup group) {
+        Log.i(TAG, "turnout group updated: " + group);
+    }
+
+    @Override
+    public void turnoutGroupRemoved(TurnoutGroup group) {
+        Log.i(TAG, "turnout group removed: " + group);
     }
 
     @Override
     public void routeAdded(Route route) {
-
+        Log.i(TAG, "route added: " + route);
     }
 
     @Override
     public void routeUpdated(Route route) {
-
+        Log.i(TAG, "route updated: " + route);
     }
 
     @Override
+    public void routeRemoved(Route route) {
+        Log.i(TAG, "route removed: " + route);
+    }
+
+
+    @Override
     public void routeGroupAdded(RouteGroup routeGroup) {
+        Log.i(TAG, "route group added: " + routeGroup);
 
     }
 
     @Override
     public void routeGroupRemoved(RouteGroup routeGroup) {
-
+        Log.i(TAG, "route group removed: " + routeGroup);
     }
 
     @Override
     public void routeGroupUpdated(RouteGroup routeGroup) {
-
+        Log.i(TAG, "route group updated: " + routeGroup);
     }
 
     @Override
     public void failure(AdHocServiceException arg0) {
-        Log.e("", "error");
+        Log.e(TAG, "failure in communication with adhocserver", arg0);
+        postEvent(new ExceptionEvent(getString(R.string.error_communication_adhocserver), arg0));
     }
 
     @Override
     public void connected() {
-        Log.i(TAG, "connected");
+        Log.i(TAG, "connected to adhocserver");
+        postEvent(new InfoEvent(getString(R.string.info_disconnected_to_adhocserver)));
     }
 
     @Override
     public void connectionError(AdHocServiceException ex) {
-
-        Log.e("", "error");
+        Log.e(TAG, "failed to connect to adhocserver", ex);
+        postEvent(new ExceptionEvent(getString(R.string.error_connection_adhocserver), ex));
     }
 
     @Override
     public void disconnected() {
+        Log.i(TAG, "disconnected from adhocserver");
+        postEvent(new InfoEvent(getString(R.string.info_disconnected_from_adhocserver)));
+    }
 
-        Log.i(TAG, "disconnected");
+
+    private void postEvent(final Object event) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                bus.post(event);
+            }
+        });
     }
 
 

@@ -1,93 +1,87 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.fork.adhocrailway.android.LocomotiveControlFragment">
+    android:orientation="vertical"
+    tools:context="ch.fork.adhocrailway.android.fragments.LocomotiveControlFragment">
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/selectedLocomotive"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bring_button_secondary"
+
+        android:clickable="true"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4px"
+            android:layout_marginRight="10px"
+            android:layout_marginTop="4px"
+            android:src="@drawable/ic_launcher"></ImageView>
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="Ae 621"
+            android:textColor="@color/bring_gray_dark"
+            android:textSize="20dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:background="@android:drawable/ic_menu_search" />
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/locomotive1Speed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:max="14" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="3dp">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
 
+        <Button
+            android:id="@+id/locomotive1Direction"
+            style="@style/AppTheme.Button.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Dir" />
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/selectedLocomotive"
+        <Button
+            android:id="@+id/locomotive1Stop"
+            style="@style/AppTheme.Button.Alert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:padding="5dp"
+            android:text="Stop" />
+
+        <Button
+            android:id="@+id/locomotiveEmergencyStop"
+            style="@style/AppTheme.Button.Alert"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/bring_button_secondary"
+            android:layout_marginLeft="5dp"
+            android:padding="5dp"
+            android:text="Emergency Stop" />
 
-            android:clickable="true"
-            android:padding="10dp">
-
-            <ImageView
-                android:id="@+id/icon"
-                android:layout_width="120dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="4px"
-                android:layout_marginRight="10px"
-                android:layout_marginTop="4px"
-                android:src="@drawable/ic_launcher"></ImageView>
-
-            <TextView
-                android:id="@+id/label"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="5dp"
-                android:text="Ae 621"
-                android:layout_weight="1"
-                android:textSize="30px"
-                android:textColor="@color/bring_gray_dark"/>
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:background="@android:drawable/ic_menu_search"/>
-        </LinearLayout>
-
-        <SeekBar
-            android:id="@+id/locomotive1Speed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:max="14" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/locomotive1Direction"
-                style="@style/AppTheme.Button.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:text="Dir" />
-
-            <Button
-                android:id="@+id/locomotive1Stop"
-                style="@style/AppTheme.Button.Alert"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:padding="5dp"
-                android:text="Stop" />
-
-            <Button
-                android:id="@+id/locomotiveEmergencyStop"
-                style="@style/AppTheme.Button.Alert"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:padding="5dp"
-                android:text="Emergency Stop" />
-
-        </LinearLayout>
     </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>

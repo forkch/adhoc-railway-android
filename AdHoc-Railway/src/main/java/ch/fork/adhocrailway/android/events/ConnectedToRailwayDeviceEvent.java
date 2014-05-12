@@ -1,4 +1,4 @@
-package ch.fork.adhocrailway.android;
+package ch.fork.adhocrailway.android.events;
 
 /**
  * Created by fork on 4/24/14.
