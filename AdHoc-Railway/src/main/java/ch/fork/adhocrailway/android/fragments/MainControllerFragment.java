@@ -51,6 +51,7 @@ public class MainControllerFragment extends Fragment {
     Button emergencyStopButton;
     @InjectView(R.id.selectedLocomotive)
     LinearLayout selectedLocomotiveView;
+    private static final String TAG = MainControllerFragment.class.getSimpleName();
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
     private int number;
