@@ -21,12 +21,10 @@ import java.util.List;
 import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.events.InfoEvent;
-import ch.fork.adhocrailway.android.fragments.LocomotiveControlFragment;
 import ch.fork.adhocrailway.android.fragments.MainControllerFragment;
-import ch.fork.adhocrailway.android.fragments.NumberControlFragment;
 import ch.fork.adhocrailway.android.fragments.PowerFragment;
 
-public class ControllerActivity extends FragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener, PowerFragment.OnPowerFragmentInteractionListener {
+public class ControllerActivity extends FragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, PowerFragment.OnPowerFragmentInteractionListener {
 
     private static final int NUM_CONTROLLER_FRAGMENTS = 4;
     private AdHocRailwayApplication adHocRailwayApplication;
@@ -80,12 +78,14 @@ public class ControllerActivity extends FragmentActivity implements MainControll
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.connect, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -120,7 +120,9 @@ public class ControllerActivity extends FragmentActivity implements MainControll
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);}
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            );
+        }
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
@@ -151,7 +153,7 @@ public class ControllerActivity extends FragmentActivity implements MainControll
         }
 
         @Override
-        public CharSequence getPageTitle (int position) {
+        public CharSequence getPageTitle(int position) {
             if (position == 0) {
                 return "Power";
             }

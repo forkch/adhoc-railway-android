@@ -38,7 +38,7 @@ import ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity;
 import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 
-public class MainControllerFragment extends Fragment implements NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener {
+public class MainControllerFragment extends Fragment {
 
     LinearLayout functionContainer;
     @InjectView(R.id.locomotive1Speed)
