@@ -289,16 +289,14 @@ public class MainControllerFragment extends Fragment {
                 return;
             }
 
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
+            enqueueJob(new NetworkJob() {
                 @Override
-                protected Void doInBackground(Void... params) {
+                public void onRun() throws Throwable {
                     adHocRailwayApplication.getLocomotiveController().emergencyStop(selectedLocomotive);
                     locomotive1Seekbar.setProgress(0);
-                    return null;
                 }
-            };
-            asyncTask.execute();
+            });
+
         }
     }
 
@@ -451,21 +449,18 @@ public class MainControllerFragment extends Fragment {
                 if (obj == null) {
                     return;
                 }
-                AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground(Void... params) {
-
-                        if (obj instanceof Turnout) {
-                            doPerformStateAction(adHocRailwayApplication.getTurnoutController(), (Turnout) obj);
-                        } else {
-                            doPerformStateAction(adHocRailwayApplication.getRouteController(), (Route) obj);
-                        }
-                        updatePreviousChangedObject();
-                        return null;
-                    }
-                };
-                asyncTask.execute();
+                enqueueJob(new NetworkJob() {
+                               @Override
+                               public void onRun() throws Throwable {
+                                   if (obj instanceof Turnout) {
+                                       doPerformStateAction(adHocRailwayApplication.getTurnoutController(), (Turnout) obj);
+                                   } else {
+                                       doPerformStateAction(adHocRailwayApplication.getRouteController(), (Route) obj);
+                                   }
+                                   updatePreviousChangedObject();
+                               }
+                           }
+                );
             } else {
                 super.onClick(v);
             }
@@ -575,18 +570,14 @@ public class MainControllerFragment extends Fragment {
                 return;
             }
 
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
+            enqueueJob(new NetworkJob() {
                 @Override
-                protected Void doInBackground(Void... params) {
+                public void onRun() throws Throwable {
                     LocomotiveController locomotiveController = adHocRailwayApplication.getLocomotiveController();
                     boolean currentFunctionValue = selectedLocomotive.getCurrentFunctions()[functionNumber];
                     locomotiveController.setFunction(selectedLocomotive, functionNumber, !currentFunctionValue, 0);
-                    return null;
                 }
-            };
-            asyncTask.execute();
-
+            });
         }
     }
 }
