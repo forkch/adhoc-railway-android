@@ -35,6 +35,7 @@ import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.activities.ControllerActivity;
 import ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity;
+import ch.fork.adhocrailway.android.jobs.SetSepeedJob;
 import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 
@@ -300,16 +301,7 @@ public class MainControllerFragment extends Fragment {
             if (selectedLocomotive == null) {
                 return;
             }
-
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
-                @Override
-                protected Void doInBackground(Void... params) {
-                    adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, progress, selectedLocomotive.getCurrentFunctions());
-                    return null;
-                }
-            };
-            asyncTask.execute();
+            adHocRailwayApplication.getJobManager(new SetSepeedJob(adHocRailwayApplication, selectedLocomotive, progress));
         }
 
         @Override

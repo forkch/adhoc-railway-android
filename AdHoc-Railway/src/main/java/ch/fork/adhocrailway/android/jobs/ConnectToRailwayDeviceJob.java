@@ -78,7 +78,7 @@ public class ConnectToRailwayDeviceJob extends Job {
         locomotiveController = new DummyLocomotiveController();
         powerController = new DummyPowerController();
 
-        adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true, turnoutController, routeController, locomotiveController, powerController, null));
+        adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true, turnoutController, routeController, locomotiveController, powerController, new PowerSupply(1)));
     }
 
     private void connectToSrcpd() {
