@@ -4,9 +4,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.path.android.jobqueue.Job;
-import com.path.android.jobqueue.Params;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -33,7 +30,7 @@ import ch.fork.adhocrailway.android.events.InfoEvent;
 /**
  * Created by fork on 27.05.14.
  */
-public class ConnectToPersistenceJob extends Job implements ServiceListener {
+public class ConnectToPersistenceJob extends NetworkJob implements ServiceListener {
     public final static String TAG = AdHocRailwayApplication.class.getSimpleName();
     private final TurnoutManager turnoutManager;
     private final RouteManager routeManager;
@@ -42,7 +39,7 @@ public class ConnectToPersistenceJob extends Job implements ServiceListener {
     private boolean useDummyServices;
 
     public ConnectToPersistenceJob(AdHocRailwayApplication adHocRailwayApplication, boolean useDummyServices, TurnoutManager turnoutManager, RouteManager routeManager, LocomotiveManager locomotiveManager) {
-        super(new Params(1).requireNetwork());
+        super();
         this.adHocRailwayApplication = adHocRailwayApplication;
         this.useDummyServices = useDummyServices;
         this.turnoutManager = turnoutManager;
@@ -50,9 +47,6 @@ public class ConnectToPersistenceJob extends Job implements ServiceListener {
         this.locomotiveManager = locomotiveManager;
     }
 
-    @Override
-    public void onAdded() {
-    }
 
     @Override
     public void onRun() throws Throwable {
@@ -63,17 +57,6 @@ public class ConnectToPersistenceJob extends Job implements ServiceListener {
             connectToAdHocServer();
         }
     }
-
-    @Override
-    protected void onCancel() {
-
-    }
-
-    @Override
-    protected boolean shouldReRunOnThrowable(Throwable throwable) {
-        return false;
-    }
-
     private void loadXml() {
         final XMLLocomotiveService xmlLocomotiveService = new XMLLocomotiveService();
         final XMLTurnoutService xmlTurnoutService = new XMLTurnoutService();

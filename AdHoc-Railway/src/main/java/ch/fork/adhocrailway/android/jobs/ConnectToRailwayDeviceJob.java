@@ -3,9 +3,6 @@ package ch.fork.adhocrailway.android.jobs;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.path.android.jobqueue.Job;
-import com.path.android.jobqueue.Params;
-
 import ch.fork.AdHocRailway.controllers.LocomotiveController;
 import ch.fork.AdHocRailway.controllers.PowerController;
 import ch.fork.AdHocRailway.controllers.RouteController;
@@ -31,7 +28,7 @@ import de.dermoba.srcp.common.exception.SRCPException;
 /**
  * Created by fork on 27.05.14.
  */
-public class ConnectToRailwayDeviceJob extends Job {
+public class ConnectToRailwayDeviceJob extends NetworkJob {
     private final AdHocRailwayApplication adHocRailwayApplication;
     private final boolean useDummyServices;
     private TurnoutController turnoutController;
@@ -42,17 +39,11 @@ public class ConnectToRailwayDeviceJob extends Job {
     private PowerSupply powerSupply;
 
     public ConnectToRailwayDeviceJob(AdHocRailwayApplication adHocRailwayApplication, boolean useDummyServices, TurnoutManager turnoutManager) {
-        super(new Params(1).requireNetwork());
+        super();
         this.adHocRailwayApplication = adHocRailwayApplication;
         this.useDummyServices = useDummyServices;
         this.turnoutManager = turnoutManager;
     }
-
-    @Override
-    public void onAdded() {
-
-    }
-
     @Override
     public void onRun() throws Throwable {
         if (useDummyServices) {
@@ -60,16 +51,6 @@ public class ConnectToRailwayDeviceJob extends Job {
         } else {
             connectToSrcpd();
         }
-    }
-
-    @Override
-    protected void onCancel() {
-
-    }
-
-    @Override
-    protected boolean shouldReRunOnThrowable(Throwable throwable) {
-        return false;
     }
 
     private void connectToDummySrcpService() {
