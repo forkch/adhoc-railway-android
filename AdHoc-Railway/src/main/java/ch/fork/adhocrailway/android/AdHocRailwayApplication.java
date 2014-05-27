@@ -419,7 +419,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         });
     }
 
-    public JobManager getJobManager(SetSepeedJob setSepeedJob) {
+    public JobManager getJobManager() {
         return jobManager;
     }
 

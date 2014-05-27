@@ -18,6 +18,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.path.android.jobqueue.Job;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayDeque;
@@ -35,6 +37,7 @@ import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.activities.ControllerActivity;
 import ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity;
+import ch.fork.adhocrailway.android.jobs.NetworkJob;
 import ch.fork.adhocrailway.android.jobs.SetSepeedJob;
 import ch.fork.adhocrailway.android.utils.ImageHelper;
 
@@ -267,6 +270,10 @@ public class MainControllerFragment extends Fragment {
 
     }
 
+    private void enqueueJob(Job job) {
+        adHocRailwayApplication.getJobManager().addJobInBackground(job);
+    }
+
     private enum NumberControlState {
         TURNOUT, ROUTE, LOCOMOTIVE_FUNCTION;
     }
@@ -301,7 +308,12 @@ public class MainControllerFragment extends Fragment {
             if (selectedLocomotive == null) {
                 return;
             }
-            adHocRailwayApplication.getJobManager(new SetSepeedJob(adHocRailwayApplication, selectedLocomotive, progress));
+            enqueueJob(new NetworkJob() {
+                @Override
+                public void onRun() throws Throwable {
+                    adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, progress, selectedLocomotive.getCurrentFunctions());
+                }
+            });
         }
 
         @Override
@@ -320,15 +332,12 @@ public class MainControllerFragment extends Fragment {
                 return;
             }
 
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
+            enqueueJob(new NetworkJob() {
                 @Override
-                protected Void doInBackground(Void... params) {
+                public void onRun() throws Throwable {
                     adHocRailwayApplication.getLocomotiveController().toggleDirection(selectedLocomotive);
-                    return null;
                 }
-            };
-            asyncTask.execute();
+            });
         }
     }
 
@@ -338,16 +347,12 @@ public class MainControllerFragment extends Fragment {
             if (selectedLocomotive == null) {
                 return;
             }
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
+            enqueueJob(new NetworkJob() {
                 @Override
-                protected Void doInBackground(Void... params) {
+                public void onRun() throws Throwable {
                     adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, 0, selectedLocomotive.getCurrentFunctions());
-                    locomotive1Seekbar.setProgress(0);
-                    return null;
                 }
-            };
-            asyncTask.execute();
+            });
         }
     }
 
@@ -395,36 +400,41 @@ public class MainControllerFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
+            enqueueJob(new NetworkJob() {
                 @Override
-                protected Void doInBackground(Void... params) {
+                public void onRun() throws Throwable {
                     int enteredNumber = getEnteredNumber();
                     if (enteredNumber == -1) {
-                        return null;
+                        return;
                     }
                     if (numberControlState == NumberControlState.TURNOUT) {
-                        Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(enteredNumber);
-                        if (turnoutByNumber == null) {
-                            resetNumbers();
-                            return null;
-                        }
-                        TurnoutController turnoutController = adHocRailwayApplication.getTurnoutController();
-                        doPerformStateAction(turnoutController, turnoutByNumber);
+                        handleTurnoutChange(enteredNumber);
                     } else {
-                        Route routeByNumber = adHocRailwayApplication.getRouteManager().getRouteByNumber(enteredNumber);
-                        if (routeByNumber == null) {
-                            resetNumbers();
-                            return null;
-                        }
-                        RouteController routeController = adHocRailwayApplication.getRouteController();
-                        doPerformStateAction(routeController, routeByNumber);
+                        handleRouteChange(enteredNumber);
                     }
                     resetNumbers();
-                    return null;
                 }
-            };
-            asyncTask.execute();
+
+                private void handleRouteChange(int enteredNumber) {
+                    Route routeByNumber = adHocRailwayApplication.getRouteManager().getRouteByNumber(enteredNumber);
+                    if (routeByNumber == null) {
+                        resetNumbers();
+                        return;
+                    }
+                    RouteController routeController = adHocRailwayApplication.getRouteController();
+                    doPerformStateAction(routeController, routeByNumber);
+                }
+
+                private void handleTurnoutChange(int enteredNumber) {
+                    Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(enteredNumber);
+                    if (turnoutByNumber == null) {
+                        resetNumbers();
+                        return;
+                    }
+                    TurnoutController turnoutController = adHocRailwayApplication.getTurnoutController();
+                    doPerformStateAction(turnoutController, turnoutByNumber);
+                }
+            });
         }
 
     }
@@ -551,7 +561,6 @@ public class MainControllerFragment extends Fragment {
             }
         }
     }
-
 
     private class FunctionButtonClickListener implements View.OnClickListener {
         private int functionNumber;
