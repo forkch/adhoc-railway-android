@@ -38,7 +38,6 @@ import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.activities.ControllerActivity;
 import ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity;
 import ch.fork.adhocrailway.android.jobs.NetworkJob;
-import ch.fork.adhocrailway.android.jobs.SetSepeedJob;
 import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 

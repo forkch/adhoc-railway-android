@@ -68,7 +68,6 @@ import ch.fork.adhocrailway.android.events.ExceptionEvent;
 import ch.fork.adhocrailway.android.events.InfoEvent;
 import ch.fork.adhocrailway.android.jobs.ConnectToPersistenceJob;
 import ch.fork.adhocrailway.android.jobs.ConnectToRailwayDeviceJob;
-import ch.fork.adhocrailway.android.jobs.SetSepeedJob;
 import de.dermoba.srcp.client.SRCPSession;
 import de.dermoba.srcp.common.exception.SRCPException;
 import timber.log.Timber;
