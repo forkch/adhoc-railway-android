@@ -47,7 +47,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/assets" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
@@ -74,28 +73,24 @@
     <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
     <orderEntry type="library" exported="" name="ch.fork.adhocrailway.model-2.2.5" level="project" />
     <orderEntry type="library" exported="" name="commons-io-2.4" level="project" />
+    <orderEntry type="library" exported="" name="timber-2.2.2" level="project" />
     <orderEntry type="library" exported="" name="otto-1.3.4" level="project" />
     <orderEntry type="library" exported="" name="android-logging-log4j-1.0.3" level="project" />
+    <orderEntry type="library" exported="" name="socketio" level="project" />
     <orderEntry type="library" exported="" name="retrofit-1.5.0" level="project" />
     <orderEntry type="library" exported="" name="ch.fork.adhocrailway.persistence-2.2.5" level="project" />
+    <orderEntry type="library" exported="" name="butterknife-5.0.0" level="project" />
+    <orderEntry type="library" exported="" name="ch.fork.adhocrailway.service-2.2.5" level="project" />
     <orderEntry type="library" exported="" name="ch.fork.adhocrailway.persistence.adhocserver-2.2.5" level="project" />
     <orderEntry type="library" exported="" name="guava-14.0.1" level="project" />
     <orderEntry type="library" exported="" name="xstream-1.4.4" level="project" />
     <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
-    <orderEntry type="library" exported="" name="commons-lang3-3.1" level="project" />
-    <orderEntry type="library" exported="" name="fest-android-1.0.8" level="project" />
-    <orderEntry type="library" exported="" name="ch.fork.adhocrailway.persistence.xml-2.2.5" level="project" />
-    <orderEntry type="library" exported="" name="fest-util-1.2.5" level="project" />
-    <orderEntry type="library" exported="" name="timber-2.2.2" level="project" />
-    <orderEntry type="library" exported="" name="socketio" level="project" />
-    <orderEntry type="library" exported="" name="butterknife-5.0.0" level="project" />
-    <orderEntry type="library" exported="" name="ch.fork.adhocrailway.service-2.2.5" level="project" />
     <orderEntry type="library" exported="" name="log4j-1.2.17" level="project" />
+    <orderEntry type="library" exported="" name="commons-lang3-3.1" level="project" />
     <orderEntry type="library" exported="" name="ch.fork.adhocrailway.railway.srcp-2.2.5" level="project" />
-    <orderEntry type="library" exported="" name="hamcrest-core-1.1" level="project" />
     <orderEntry type="library" exported="" name="jsrcpc-2.3.1" level="project" />
-    <orderEntry type="library" exported="" name="junit-4.10" level="project" />
-    <orderEntry type="library" exported="" name="fest-assert-core-2.0M10" level="project" />
+    <orderEntry type="library" exported="" name="android-priority-jobqueue-1.1.2" level="project" />
+    <orderEntry type="library" exported="" name="ch.fork.adhocrailway.persistence.xml-2.2.5" level="project" />
   </component>
 </module>
 

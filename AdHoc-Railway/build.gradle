@@ -2,8 +2,8 @@ apply plugin: 'android'
 apply plugin: 'maven'
 
 repositories {
-    maven { url '/home/fork/Code/forkch-mvn-repo' }
     mavenCentral()
+    maven { url '/home/fork/Code/forkch-mvn-repo' }
     maven { url 'https://raw.githubusercontent.com/forkch/forkch-mvn-repo/master' }
 }
 
@@ -36,6 +36,7 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'org.apache.commons:commons-lang3:3.1'
     compile 'de.mindpipe.android:android-logging-log4j:1.0.+'
+    compile 'com.path:android-priority-jobqueue:1.1.2'
 
 }
 
