@@ -94,7 +94,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     private Bus bus;
     private Handler handler;
     private SRCPSession session;
-    private String srcpServerHost;
     private PowerSupply powerSupply;
     private JobManager jobManager;
 
@@ -286,6 +285,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
             routeController = event.getRouteController();
             powerController = event.getPowerController();
             powerSupply = event.getPowerSupply();
+            session = event.getSession();
         }
     }
 

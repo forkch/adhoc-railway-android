@@ -59,7 +59,7 @@ public class ConnectToRailwayDeviceJob extends NetworkJob {
         locomotiveController = new DummyLocomotiveController();
         powerController = new DummyPowerController();
 
-        adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true, turnoutController, routeController, locomotiveController, powerController, new PowerSupply(1)));
+        adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true, turnoutController, routeController, locomotiveController, powerController, new PowerSupply(1), null));
     }
 
     private void connectToSrcpd() {
@@ -92,7 +92,7 @@ public class ConnectToRailwayDeviceJob extends NetworkJob {
             routeController = srcpRouteControlAdapter;
             powerController = srcpPowerControlAdapter;
 
-            adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true, turnoutController, routeController, locomotiveController, powerController, powerSupply));
+            adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true, turnoutController, routeController, locomotiveController, powerController, powerSupply, session));
         } catch (SRCPException e) {
             adHocRailwayApplication.postEvent(new ExceptionEvent(adHocRailwayApplication.getString(R.string.error_failed_to_connect_srcpserver), e));
             adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(false));
