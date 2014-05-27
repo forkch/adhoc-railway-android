@@ -1,4 +1,8 @@
 language: android
+
+script: ./gradlew clean build
+
+
 android:
   components:
     - build-tools-19.0.3
