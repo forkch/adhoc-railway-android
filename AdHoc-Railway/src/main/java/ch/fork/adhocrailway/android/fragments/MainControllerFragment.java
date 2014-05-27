@@ -40,6 +40,7 @@ import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 public class MainControllerFragment extends Fragment {
 
+    private static final String TAG = MainControllerFragment.class.getSimpleName();
     LinearLayout functionContainer;
     @InjectView(R.id.locomotive1Speed)
     SeekBar locomotive1Seekbar;
@@ -51,7 +52,6 @@ public class MainControllerFragment extends Fragment {
     Button emergencyStopButton;
     @InjectView(R.id.selectedLocomotive)
     LinearLayout selectedLocomotiveView;
-    private static final String TAG = MainControllerFragment.class.getSimpleName();
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
     private int number;
