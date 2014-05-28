@@ -27,6 +27,7 @@ public class ConnectedToRailwayDeviceEvent {
         powerController = null;
         locomotiveController = null;
         powerSupply = null;
+        session = null;
     }
 
     public ConnectedToRailwayDeviceEvent(boolean connected, TurnoutController turnoutController, RouteController routeController, LocomotiveController locomotiveController, PowerController powerController, PowerSupply powerSupply, SRCPSession session) {
