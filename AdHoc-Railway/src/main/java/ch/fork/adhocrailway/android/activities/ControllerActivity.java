@@ -125,6 +125,7 @@ public class ControllerActivity extends FragmentActivity implements MainControll
         }
     }
 
+
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         private final List<MainControllerFragment> fragments = new ArrayList<MainControllerFragment>();
         private PowerFragment powerFragment;
