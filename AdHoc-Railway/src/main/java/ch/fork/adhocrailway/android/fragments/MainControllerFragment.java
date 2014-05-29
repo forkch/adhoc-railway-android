@@ -348,6 +348,7 @@ public class MainControllerFragment extends Fragment {
                 @Override
                 public void onRun() throws Throwable {
                     adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, 0, selectedLocomotive.getCurrentFunctions());
+                    locomotive1Seekbar.setProgress(0);
                 }
             });
         }
