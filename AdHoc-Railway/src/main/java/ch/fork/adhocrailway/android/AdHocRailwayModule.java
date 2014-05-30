@@ -7,6 +7,10 @@ import com.squareup.otto.ThreadEnforcer;
 
 import javax.inject.Singleton;
 
+import ch.fork.AdHocRailway.controllers.LocomotiveController;
+import ch.fork.AdHocRailway.controllers.PowerController;
+import ch.fork.AdHocRailway.controllers.RouteController;
+import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.manager.LocomotiveManager;
 import ch.fork.AdHocRailway.manager.RouteManager;
 import ch.fork.AdHocRailway.manager.TurnoutManager;
@@ -61,6 +65,26 @@ public class AdHocRailwayModule {
     @Singleton
     public LocomotiveManager providesLocomotiveManager() {
         return new LocomotiveManagerImpl();
+    }
+
+    @Provides
+    public TurnoutController providesTurnoutController() {
+        return adHocRailwayApplication.getTurnoutController();
+    }
+
+    @Provides
+    public RouteController providesRouteController() {
+        return adHocRailwayApplication.getRouteController();
+    }
+
+    @Provides
+    public LocomotiveController providesLocomotiveController() {
+        return adHocRailwayApplication.getLocomotiveController();
+    }
+
+    @Provides
+    public PowerController providesPowerController() {
+        return adHocRailwayApplication.getPowerController();
     }
 
     @Provides

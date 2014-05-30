@@ -13,6 +13,8 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import ch.fork.AdHocRailway.controllers.PowerChangeListener;
 import ch.fork.AdHocRailway.controllers.PowerController;
 import ch.fork.AdHocRailway.model.power.Booster;
@@ -22,6 +24,8 @@ import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.R;
 
 public class PowerFragment extends Fragment implements PowerChangeListener {
+    @Inject
+    PowerController powerController;
     private OnPowerFragmentInteractionListener mListener;
     private View fragmentView;
     private AdHocRailwayApplication adHocRailwayApplication;
@@ -132,7 +136,6 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
             AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    PowerController powerController = adHocRailwayApplication.getPowerController();
                     powerController.toggleBooster(adHocRailwayApplication.getPowerSupply().getBooster(boosterNumber));
                     return null;
                 }

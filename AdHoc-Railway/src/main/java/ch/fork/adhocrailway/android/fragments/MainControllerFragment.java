@@ -3,7 +3,6 @@ package ch.fork.adhocrailway.android.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.path.android.jobqueue.Job;
-import com.squareup.otto.Bus;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -64,6 +62,12 @@ public class MainControllerFragment extends BaseFragment {
     TurnoutManager turnoutManager;
     @Inject
     RouteManager routeManager;
+    @Inject
+    LocomotiveController locomotiveController;
+    @Inject
+    TurnoutController turnoutController;
+    @Inject
+    RouteController routeController;
 
 
     private OnFragmentInteractionListener mListener;
@@ -302,7 +306,7 @@ public class MainControllerFragment extends BaseFragment {
             enqueueJob(new NetworkJob() {
                 @Override
                 public void onRun() throws Throwable {
-                    adHocRailwayApplication.getLocomotiveController().emergencyStop(selectedLocomotive);
+                    locomotiveController.emergencyStop(selectedLocomotive);
                     locomotive1Seekbar.setProgress(0);
                 }
             });
@@ -319,7 +323,7 @@ public class MainControllerFragment extends BaseFragment {
             enqueueJob(new NetworkJob() {
                 @Override
                 public void onRun() throws Throwable {
-                    adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, progress, selectedLocomotive.getCurrentFunctions());
+                    locomotiveController.setSpeed(selectedLocomotive, progress, selectedLocomotive.getCurrentFunctions());
                 }
             });
         }
@@ -343,7 +347,7 @@ public class MainControllerFragment extends BaseFragment {
             enqueueJob(new NetworkJob() {
                 @Override
                 public void onRun() throws Throwable {
-                    adHocRailwayApplication.getLocomotiveController().toggleDirection(selectedLocomotive);
+                    locomotiveController.toggleDirection(selectedLocomotive);
                 }
             });
         }
@@ -358,7 +362,7 @@ public class MainControllerFragment extends BaseFragment {
             enqueueJob(new NetworkJob() {
                 @Override
                 public void onRun() throws Throwable {
-                    adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, 0, selectedLocomotive.getCurrentFunctions());
+                    locomotiveController.setSpeed(selectedLocomotive, 0, selectedLocomotive.getCurrentFunctions());
                     locomotive1Seekbar.setProgress(0);
                 }
             });
@@ -430,7 +434,6 @@ public class MainControllerFragment extends BaseFragment {
                         resetNumbers();
                         return;
                     }
-                    RouteController routeController = adHocRailwayApplication.getRouteController();
                     doPerformStateAction(routeController, routeByNumber);
                 }
 
@@ -440,7 +443,6 @@ public class MainControllerFragment extends BaseFragment {
                         resetNumbers();
                         return;
                     }
-                    TurnoutController turnoutController = adHocRailwayApplication.getTurnoutController();
                     doPerformStateAction(turnoutController, turnoutByNumber);
                 }
             });
@@ -464,9 +466,9 @@ public class MainControllerFragment extends BaseFragment {
                                @Override
                                public void onRun() throws Throwable {
                                    if (obj instanceof Turnout) {
-                                       doPerformStateAction(adHocRailwayApplication.getTurnoutController(), (Turnout) obj);
+                                       doPerformStateAction(turnoutController, (Turnout) obj);
                                    } else {
-                                       doPerformStateAction(adHocRailwayApplication.getRouteController(), (Route) obj);
+                                       doPerformStateAction(routeController, (Route) obj);
                                    }
                                    updatePreviousChangedObject();
                                }
@@ -584,7 +586,6 @@ public class MainControllerFragment extends BaseFragment {
             enqueueJob(new NetworkJob() {
                 @Override
                 public void onRun() throws Throwable {
-                    LocomotiveController locomotiveController = adHocRailwayApplication.getLocomotiveController();
                     boolean currentFunctionValue = selectedLocomotive.getCurrentFunctions()[functionNumber];
                     locomotiveController.setFunction(selectedLocomotive, functionNumber, !currentFunctionValue, 0);
                 }
