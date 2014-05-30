@@ -21,6 +21,9 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import ch.fork.AdHocRailway.manager.LocomotiveManager;
+import ch.fork.AdHocRailway.manager.RouteManager;
+import ch.fork.AdHocRailway.manager.TurnoutManager;
 import ch.fork.AdHocRailway.manager.impl.events.LocomotivesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.RoutesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
@@ -29,6 +32,8 @@ import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.events.ConnectedToRailwayDeviceEvent;
 import ch.fork.adhocrailway.android.events.ExceptionEvent;
 import ch.fork.adhocrailway.android.events.InfoEvent;
+import ch.fork.adhocrailway.android.jobs.ConnectToPersistenceJob;
+import ch.fork.adhocrailway.android.jobs.ConnectToRailwayDeviceJob;
 
 public class ConnectActivity extends BaseActivity {
 
@@ -46,6 +51,13 @@ public class ConnectActivity extends BaseActivity {
     @InjectView(R.id.serversTextView)
     TextView serversTextView;
 
+
+    @Inject
+    TurnoutManager turnoutManager;
+    @Inject
+    RouteManager routeManager;
+    @Inject
+    LocomotiveManager locomotiveManager;
     private AdHocRailwayApplication adHocRailwayApplication;
     private boolean locomotivesLoaded;
     private boolean routesLoaded;
@@ -86,10 +98,33 @@ public class ConnectActivity extends BaseActivity {
                 connectingProgress.setVisibility(View.VISIBLE);
                 connectButton.setEnabled(false);
                 adHocRailwayApplication.clearServers();
-                adHocRailwayApplication.connectToPersistence();
-                adHocRailwayApplication.connectToRailwayDevice();
+                connectToPersistence();
+                connectToRailwayDevice();
             }
         });
+    }
+
+    public void connectToRailwayDevice() {
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean useDummyServices = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
+
+        ConnectToRailwayDeviceJob connectToRailwayDeviceJob = new ConnectToRailwayDeviceJob(adHocRailwayApplication, useDummyServices, turnoutManager);
+        adHocRailwayApplication.getJobManager().addJobInBackground(connectToRailwayDeviceJob);
+    }
+
+    public void connectToPersistence() {
+        turnoutManager.addTurnoutManagerListener(adHocRailwayApplication);
+        routeManager.addRouteManagerListener(adHocRailwayApplication);
+        locomotiveManager.addLocomotiveManagerListener(adHocRailwayApplication);
+
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean useDummyServices = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
+
+        ConnectToPersistenceJob connectToPersistenceJob = new ConnectToPersistenceJob(adHocRailwayApplication, useDummyServices, turnoutManager, routeManager, locomotiveManager);
+
+        adHocRailwayApplication.getJobManager().addJobInBackground(connectToPersistenceJob);
     }
 
     @Subscribe

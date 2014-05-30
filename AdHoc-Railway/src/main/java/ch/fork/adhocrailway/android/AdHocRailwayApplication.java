@@ -186,79 +186,25 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         this.selectedLocomotive = selectedLocomotive;
     }
 
-    public void connectToRailwayDevice() {
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean useDummyServices = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
-
-        ConnectToRailwayDeviceJob connectToRailwayDeviceJob = new ConnectToRailwayDeviceJob(this, useDummyServices, turnoutManager);
-        jobManager.addJobInBackground(connectToRailwayDeviceJob);
-    }
-
-    public void connectToPersistence() {
-        turnoutManager.addTurnoutManagerListener(AdHocRailwayApplication.this);
-        routeManager.addRouteManagerListener(AdHocRailwayApplication.this);
-        locomotiveManager.addLocomotiveManagerListener(AdHocRailwayApplication.this);
-
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean useDummyServices = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
-
-        ConnectToPersistenceJob connectToPersistenceJob = new ConnectToPersistenceJob(this, useDummyServices, turnoutManager, routeManager, locomotiveManager);
-
-        jobManager.addJobInBackground(connectToPersistenceJob);
-    }
 
     public TurnoutController getTurnoutController() {
         return turnoutController;
-    }
-
-    public void setTurnoutController(TurnoutController turnoutController) {
-        this.turnoutController = turnoutController;
     }
 
     public RouteController getRouteController() {
         return routeController;
     }
 
-    public void setRouteController(RouteController routeController) {
-        this.routeController = routeController;
-    }
-
     public LocomotiveController getLocomotiveController() {
         return locomotiveController;
-    }
-
-    public void setLocomotiveController(LocomotiveController locomotiveController) {
-        this.locomotiveController = locomotiveController;
     }
 
     public PowerController getPowerController() {
         return powerController;
     }
 
-    public void setPowerController(PowerController powerController) {
-        this.powerController = powerController;
-    }
-
-    public TurnoutManager getTurnoutManager() {
-        return turnoutManager;
-    }
-
-    public RouteManager getRouteManager() {
-        return routeManager;
-    }
-
-    public LocomotiveManager getLocomotiveManager() {
-        return locomotiveManager;
-    }
-
     public PowerSupply getPowerSupply() {
         return powerSupply;
-    }
-
-    public Bus getBus() {
-        return bus;
     }
 
     public void clearServers() {
