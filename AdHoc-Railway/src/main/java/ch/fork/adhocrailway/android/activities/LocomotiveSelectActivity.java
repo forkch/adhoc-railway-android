@@ -21,7 +21,7 @@ import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.adapters.LocomotiveListAdapter;
 
 
-public class LocomotiveSelectActivity extends ListActivity {
+public class LocomotiveSelectActivity extends BaseListActivity {
 
     private List<Locomotive> locomotives;
     private SortedSet<Locomotive> sortedLocomotives;

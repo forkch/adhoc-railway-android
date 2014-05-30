@@ -2,7 +2,6 @@ package ch.fork.adhocrailway.android.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,17 +18,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.path.android.jobqueue.Job;
+import com.squareup.otto.Bus;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import ch.fork.AdHocRailway.controllers.LocomotiveController;
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
+import ch.fork.AdHocRailway.manager.RouteManager;
+import ch.fork.AdHocRailway.manager.TurnoutManager;
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.turnouts.Route;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
@@ -41,7 +45,7 @@ import ch.fork.adhocrailway.android.jobs.NetworkJob;
 import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 
-public class MainControllerFragment extends Fragment {
+public class MainControllerFragment extends BaseFragment {
 
     private static final String TAG = MainControllerFragment.class.getSimpleName();
     LinearLayout functionContainer;
@@ -55,6 +59,13 @@ public class MainControllerFragment extends Fragment {
     Button emergencyStopButton;
     @InjectView(R.id.selectedLocomotive)
     LinearLayout selectedLocomotiveView;
+
+    @Inject
+    TurnoutManager turnoutManager;
+    @Inject
+    RouteManager routeManager;
+
+
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
     private int number;
@@ -414,7 +425,7 @@ public class MainControllerFragment extends Fragment {
                 }
 
                 private void handleRouteChange(int enteredNumber) {
-                    Route routeByNumber = adHocRailwayApplication.getRouteManager().getRouteByNumber(enteredNumber);
+                    Route routeByNumber = routeManager.getRouteByNumber(enteredNumber);
                     if (routeByNumber == null) {
                         resetNumbers();
                         return;
@@ -424,7 +435,7 @@ public class MainControllerFragment extends Fragment {
                 }
 
                 private void handleTurnoutChange(int enteredNumber) {
-                    Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(enteredNumber);
+                    Turnout turnoutByNumber = turnoutManager.getTurnoutByNumber(enteredNumber);
                     if (turnoutByNumber == null) {
                         resetNumbers();
                         return;

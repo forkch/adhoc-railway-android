@@ -13,21 +13,17 @@ import com.path.android.jobqueue.config.Configuration;
 import com.path.android.jobqueue.log.CustomLogger;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
-import com.squareup.otto.ThreadEnforcer;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.SortedSet;
-import java.util.UUID;
+
+import javax.inject.Inject;
 
 import ch.fork.AdHocRailway.controllers.LocomotiveController;
 import ch.fork.AdHocRailway.controllers.PowerController;
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
-import ch.fork.AdHocRailway.controllers.impl.dummy.DummyLocomotiveController;
-import ch.fork.AdHocRailway.controllers.impl.dummy.DummyPowerController;
-import ch.fork.AdHocRailway.controllers.impl.dummy.DummyRouteController;
-import ch.fork.AdHocRailway.controllers.impl.dummy.DummyTurnoutController;
 import ch.fork.AdHocRailway.manager.LocomotiveManager;
 import ch.fork.AdHocRailway.manager.LocomotiveManagerListener;
 import ch.fork.AdHocRailway.manager.RouteManager;
@@ -36,7 +32,6 @@ import ch.fork.AdHocRailway.manager.TurnoutManager;
 import ch.fork.AdHocRailway.manager.TurnoutManagerListener;
 import ch.fork.AdHocRailway.manager.impl.LocomotiveManagerImpl;
 import ch.fork.AdHocRailway.manager.impl.RouteManagerImpl;
-import ch.fork.AdHocRailway.manager.impl.TurnoutManagerImpl;
 import ch.fork.AdHocRailway.manager.impl.events.LocomotivesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.RoutesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
@@ -47,27 +42,14 @@ import ch.fork.AdHocRailway.model.turnouts.Route;
 import ch.fork.AdHocRailway.model.turnouts.RouteGroup;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
 import ch.fork.AdHocRailway.model.turnouts.TurnoutGroup;
-import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestLocomotiveService;
-import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestRouteService;
-import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestTurnoutService;
-import ch.fork.AdHocRailway.persistence.adhocserver.impl.socketio.SIOService;
-import ch.fork.AdHocRailway.persistence.adhocserver.impl.socketio.ServiceListener;
-import ch.fork.AdHocRailway.persistence.xml.XMLServiceHelper;
-import ch.fork.AdHocRailway.persistence.xml.impl.XMLLocomotiveService;
-import ch.fork.AdHocRailway.persistence.xml.impl.XMLRouteService;
-import ch.fork.AdHocRailway.persistence.xml.impl.XMLTurnoutService;
-import ch.fork.AdHocRailway.railway.srcp.SRCPLocomotiveControlAdapter;
-import ch.fork.AdHocRailway.railway.srcp.SRCPPowerControlAdapter;
-import ch.fork.AdHocRailway.railway.srcp.SRCPRouteControlAdapter;
-import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 import ch.fork.AdHocRailway.services.AdHocServiceException;
 import ch.fork.AdHocRailway.services.LocomotiveServiceListener;
 import ch.fork.adhocrailway.android.activities.SettingsActivity;
 import ch.fork.adhocrailway.android.events.ConnectedToRailwayDeviceEvent;
 import ch.fork.adhocrailway.android.events.ExceptionEvent;
-import ch.fork.adhocrailway.android.events.InfoEvent;
 import ch.fork.adhocrailway.android.jobs.ConnectToPersistenceJob;
 import ch.fork.adhocrailway.android.jobs.ConnectToRailwayDeviceJob;
+import dagger.ObjectGraph;
 import de.dermoba.srcp.client.SRCPSession;
 import de.dermoba.srcp.common.exception.SRCPException;
 import timber.log.Timber;
@@ -79,35 +61,37 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     public final static String TAG = AdHocRailwayApplication.class.getSimpleName();
     //private static final String SERVER_HOST = "adhocserver";
     public static final String SERVER_HOST = "forkch.dyndns.org";
+
+    @Inject
+    TurnoutManager turnoutManager;
+    @Inject
+    RouteManager routeManager;
+    @Inject
+    LocomotiveManager locomotiveManager;
+    @Inject
+    Bus bus;
+
     private SortedSet<LocomotiveGroup> locomotiveGroups;
     private Locomotive selectedLocomotive;
-
     private LocomotiveController locomotiveController;
     private TurnoutController turnoutController;
     private RouteController routeController;
     private PowerController powerController;
-
-    private TurnoutManager turnoutManager;
-    private RouteManager routeManager;
-    private LocomotiveManager locomotiveManager;
-
-    private Bus bus;
     private Handler handler;
     private SRCPSession session;
     private PowerSupply powerSupply;
     private JobManager jobManager;
+    private ObjectGraph objectGraph;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        //setupStrictModePolicies();
 
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectNetwork().detectCustomSlowCalls().detectDiskReads().detectDiskWrites().penaltyLog().penaltyDeath().build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectActivityLeaks()
-                .penaltyLog().build());
+        setupDagger();
+
         //ConfigureLog4J.configure();
-        bus = new Bus(ThreadEnforcer.ANY);
         bus.register(this);
         handler = new Handler();
 
@@ -125,6 +109,30 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
             }
         };
         startJobManager.execute();
+    }
+
+    private void setupDagger() {
+        Object[] modules = getModules().toArray();
+        objectGraph = ObjectGraph.create(modules);
+        objectGraph.inject(this);
+    }
+
+    private void setupStrictModePolicies() {
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectNetwork().detectCustomSlowCalls().detectDiskReads().detectDiskWrites().penaltyLog().penaltyDeath().build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectActivityLeaks()
+                .penaltyLog().build());
+    }
+
+    public ObjectGraph getObjectGraph() {
+        return this.objectGraph;
+    }
+
+
+    protected List<Object> getModules() {
+        return Arrays.<Object>asList(
+                new AdHocRailwayModule(this)
+        );
     }
 
 
@@ -187,13 +195,9 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         jobManager.addJobInBackground(connectToRailwayDeviceJob);
     }
 
-
     public void connectToPersistence() {
-        turnoutManager = new TurnoutManagerImpl();
         turnoutManager.addTurnoutManagerListener(AdHocRailwayApplication.this);
-        routeManager = new RouteManagerImpl(turnoutManager);
         routeManager.addRouteManagerListener(AdHocRailwayApplication.this);
-        locomotiveManager = new LocomotiveManagerImpl();
         locomotiveManager.addLocomotiveManagerListener(AdHocRailwayApplication.this);
 
 

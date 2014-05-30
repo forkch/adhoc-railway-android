@@ -14,9 +14,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.common.eventbus.Subscribe;
+import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.R;
@@ -24,7 +27,7 @@ import ch.fork.adhocrailway.android.events.InfoEvent;
 import ch.fork.adhocrailway.android.fragments.MainControllerFragment;
 import ch.fork.adhocrailway.android.fragments.PowerFragment;
 
-public class ControllerActivity extends FragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, PowerFragment.OnPowerFragmentInteractionListener {
+public class ControllerActivity extends BaseFragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, PowerFragment.OnPowerFragmentInteractionListener {
 
     private static final int NUM_CONTROLLER_FRAGMENTS = 4;
     private AdHocRailwayApplication adHocRailwayApplication;
@@ -51,14 +54,12 @@ public class ControllerActivity extends FragmentActivity implements MainControll
     protected void onResume() {
         super.onResume();
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
-        adHocRailwayApplication.getBus().register(this);
         onLocomotiveSelected();
 
     }
 
     @Override
     protected void onStop() {
-        adHocRailwayApplication.getBus().unregister(this);
         super.onStop();
     }
 

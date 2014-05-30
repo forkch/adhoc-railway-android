@@ -14,7 +14,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -27,7 +30,7 @@ import ch.fork.adhocrailway.android.events.ConnectedToRailwayDeviceEvent;
 import ch.fork.adhocrailway.android.events.ExceptionEvent;
 import ch.fork.adhocrailway.android.events.InfoEvent;
 
-public class ConnectActivity extends Activity {
+public class ConnectActivity extends BaseActivity {
 
     private static final String TAG = ConnectActivity.class.getSimpleName();
     @InjectView(R.id.connectButton)
@@ -106,7 +109,6 @@ public class ConnectActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        adHocRailwayApplication.getBus().register(this);
         initValues();
         locomotivesLoaded = false;
         turnoutsLoaded = false;
@@ -118,7 +120,6 @@ public class ConnectActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        adHocRailwayApplication.getBus().unregister(this);
     }
 
     @Override
