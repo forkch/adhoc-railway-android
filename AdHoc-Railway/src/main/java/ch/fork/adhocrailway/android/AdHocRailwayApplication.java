@@ -124,17 +124,15 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
                 .penaltyLog().build());
     }
 
-    public ObjectGraph getObjectGraph() {
-        return this.objectGraph;
-    }
-
-
     protected List<Object> getModules() {
         return Arrays.<Object>asList(
                 new AdHocRailwayModule(this)
         );
     }
 
+    public <T> T inject(T obj) {
+        return objectGraph.inject(obj);
+    }
 
     private void configureJobManager() {
         Configuration configuration = new Configuration.Builder(this)

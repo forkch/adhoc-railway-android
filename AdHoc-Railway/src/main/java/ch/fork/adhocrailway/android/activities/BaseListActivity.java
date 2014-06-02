@@ -15,7 +15,7 @@ public abstract class BaseListActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AdHocRailwayApplication adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
-        adHocRailwayApplication.getObjectGraph().inject(this);
+        adHocRailwayApplication.inject(this);
     }
 
 }

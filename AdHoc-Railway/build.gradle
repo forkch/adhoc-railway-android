@@ -46,6 +46,7 @@ dependencies {
 
     androidTestCompile 'com.jakewharton.espresso:espresso:1.1-r3'
     androidTestCompile 'com.squareup:fest-android:1.0.8'
+    androidTestCompile 'org.robolectric:robolectric:2.+'
 }
 
 android {

@@ -68,12 +68,11 @@ public class MainControllerFragment extends BaseFragment {
     TurnoutController turnoutController;
     @Inject
     RouteController routeController;
-
-
+    @Inject
+    AdHocRailwayApplication adHocRailwayApplication;
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
     private int number;
-    private AdHocRailwayApplication adHocRailwayApplication;
     private Locomotive selectedLocomotive;
     private StringBuffer enteredNumberKeys = new StringBuffer();
     private TextView currentNumber;
@@ -138,7 +137,6 @@ public class MainControllerFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        adHocRailwayApplication = (AdHocRailwayApplication) getActivity().getApplication();
         updateSelectedLocomotive();
     }
 
@@ -157,7 +155,6 @@ public class MainControllerFragment extends BaseFragment {
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        adHocRailwayApplication = (AdHocRailwayApplication) getActivity().getApplication();
         if (savedInstanceState != null && savedInstanceState.containsKey("selectedLocomotive")) {
             selectedLocomotive = (Locomotive) savedInstanceState.getSerializable("selectedLocomotive");
             if (selectedLocomotive != null) {

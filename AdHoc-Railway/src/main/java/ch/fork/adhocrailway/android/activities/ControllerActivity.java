@@ -3,7 +3,6 @@ package ch.fork.adhocrailway.android.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
@@ -14,7 +13,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.common.eventbus.Subscribe;
-import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +28,9 @@ import ch.fork.adhocrailway.android.fragments.PowerFragment;
 public class ControllerActivity extends BaseFragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, PowerFragment.OnPowerFragmentInteractionListener {
 
     private static final int NUM_CONTROLLER_FRAGMENTS = 4;
-    private AdHocRailwayApplication adHocRailwayApplication;
+    @Inject
+    AdHocRailwayApplication adHocRailwayApplication;
+
     private ViewPager mPager;
 
     private PagerAdapter mPagerAdapter;

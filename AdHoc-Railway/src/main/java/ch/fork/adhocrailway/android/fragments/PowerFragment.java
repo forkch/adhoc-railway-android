@@ -26,9 +26,10 @@ import ch.fork.adhocrailway.android.R;
 public class PowerFragment extends Fragment implements PowerChangeListener {
     @Inject
     PowerController powerController;
+    @Inject
+    AdHocRailwayApplication adHocRailwayApplication;
     private OnPowerFragmentInteractionListener mListener;
     private View fragmentView;
-    private AdHocRailwayApplication adHocRailwayApplication;
     private List<Button> boosterButtons = Lists.newArrayList();
 
 

@@ -19,7 +19,7 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AdHocRailwayApplication adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
-        adHocRailwayApplication.getObjectGraph().inject(this);
+        adHocRailwayApplication.inject(this);
         // Display the fragment as the main content.
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())

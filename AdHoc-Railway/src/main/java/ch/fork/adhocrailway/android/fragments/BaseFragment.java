@@ -18,6 +18,6 @@ public class BaseFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         AdHocRailwayApplication adHocRailwayApplication = (AdHocRailwayApplication) activity.getApplication();
-        adHocRailwayApplication.getObjectGraph().inject(this);
+        adHocRailwayApplication.inject(this);
     }
 }

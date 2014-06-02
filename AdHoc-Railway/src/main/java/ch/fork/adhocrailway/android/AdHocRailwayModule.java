@@ -22,6 +22,7 @@ import ch.fork.adhocrailway.android.activities.ControllerActivity;
 import ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity;
 import ch.fork.adhocrailway.android.activities.SettingsActivity;
 import ch.fork.adhocrailway.android.fragments.MainControllerFragment;
+import ch.fork.adhocrailway.android.fragments.PowerFragment;
 import dagger.Module;
 import dagger.Provides;
 
@@ -30,8 +31,13 @@ import dagger.Provides;
  */
 
 @Module(
-        injects = {AdHocRailwayApplication.class, ConnectActivity.class, ControllerActivity.class, LocomotiveSelectActivity.class, SettingsActivity.class, MainControllerFragment.class},
-        library = true
+        injects = {AdHocRailwayApplication.class,
+                ConnectActivity.class,
+                ControllerActivity.class,
+                LocomotiveSelectActivity.class,
+                SettingsActivity.class,
+                MainControllerFragment.class,
+                PowerFragment.class}
 )
 public class AdHocRailwayModule {
 
@@ -44,20 +50,19 @@ public class AdHocRailwayModule {
     }
 
     @Provides
-    public Context provideApplicationContext() {
-        return this.context;
+    public AdHocRailwayApplication providesAdHocRailwayApplication() {
+        return this.adHocRailwayApplication;
     }
-
 
     @Provides
     @Singleton
-    public TurnoutManager provideTurnoutManager() {
+    public TurnoutManager providesTurnoutManager() {
         return new TurnoutManagerImpl();
     }
 
     @Provides
     @Singleton
-    public RouteManager provideRouteManager(TurnoutManager turnoutManager) {
+    public RouteManager providesRouteManager(TurnoutManager turnoutManager) {
         return new RouteManagerImpl(turnoutManager);
     }
 
@@ -89,7 +94,7 @@ public class AdHocRailwayModule {
 
     @Provides
     @Singleton
-    public Bus provideEventBus() {
+    public Bus providesEventBus() {
         return new Bus(ThreadEnforcer.ANY);
     }
 }

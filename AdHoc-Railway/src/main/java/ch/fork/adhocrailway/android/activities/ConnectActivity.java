@@ -1,6 +1,5 @@
 package ch.fork.adhocrailway.android.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
@@ -42,7 +40,7 @@ public class ConnectActivity extends BaseActivity {
     Button connectButton;
 
     @InjectView(R.id.connectingProgress)
-     ProgressBar connectingProgress;
+    ProgressBar connectingProgress;
     @InjectView(R.id.adhocServerHostTextView)
     TextView adHocServerHostTextView;
     @InjectView(R.id.srcpServerHostTextView)
@@ -58,7 +56,8 @@ public class ConnectActivity extends BaseActivity {
     RouteManager routeManager;
     @Inject
     LocomotiveManager locomotiveManager;
-    private AdHocRailwayApplication adHocRailwayApplication;
+    @Inject
+    AdHocRailwayApplication adHocRailwayApplication;
     private boolean locomotivesLoaded;
     private boolean routesLoaded;
     private boolean turnoutsLoaded;
@@ -80,7 +79,7 @@ public class ConnectActivity extends BaseActivity {
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean dummyServers = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
-        if(dummyServers) {
+        if (dummyServers) {
             serversTextView.setText("Servers: DUMMY!!!");
         } else {
             serversTextView.setText("Servers:");
@@ -141,6 +140,7 @@ public class ConnectActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
     }
+
     @Override
     protected void onResume() {
         super.onResume();
