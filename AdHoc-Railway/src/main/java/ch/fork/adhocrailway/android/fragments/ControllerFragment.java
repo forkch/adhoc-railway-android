@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.path.android.jobqueue.Job;
+import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,7 +28,6 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import ch.fork.AdHocRailway.controllers.LocomotiveController;
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.manager.RouteManager;
@@ -40,12 +40,13 @@ import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.activities.ControllerActivity;
 import ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity;
 import ch.fork.adhocrailway.android.jobs.NetworkJob;
+import ch.fork.adhocrailway.android.presenters.ControllerPresenter;
 import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 
-public class MainControllerFragment extends BaseFragment {
+public class ControllerFragment extends BaseFragment {
 
-    private static final String TAG = MainControllerFragment.class.getSimpleName();
+    private static final String TAG = ControllerFragment.class.getSimpleName();
     LinearLayout functionContainer;
     @InjectView(R.id.locomotive1Speed)
     SeekBar locomotive1Seekbar;
@@ -58,18 +59,33 @@ public class MainControllerFragment extends BaseFragment {
     @InjectView(R.id.selectedLocomotive)
     LinearLayout selectedLocomotiveView;
 
+    @InjectView(R.id.turnoutButtonDefault)
+    Button defaultStateButton;
+    @InjectView(R.id.turnoutButtonNonDefault)
+    Button nonDefaultStateButton;
+    @InjectView(R.id.turnoutButtonLeft)
+    Button leftStateButton;
+
+    @InjectView(R.id.turnoutButtonRight)
+    Button rightStateButton;
+    @InjectView(R.id.turnoutButtonStraight)
+    Button straightStateButton;
+    @InjectView(R.id.turnoutButtonPeriod)
+    Button periodButton;
+
     @Inject
     TurnoutManager turnoutManager;
     @Inject
     RouteManager routeManager;
-    @Inject
-    LocomotiveController locomotiveController;
     @Inject
     TurnoutController turnoutController;
     @Inject
     RouteController routeController;
     @Inject
     AdHocRailwayApplication adHocRailwayApplication;
+    @Inject
+    ControllerPresenter controllerPresenter;
+
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
     private int number;
@@ -80,14 +96,15 @@ public class MainControllerFragment extends BaseFragment {
     private TextView routeIndicator;
     private Deque<Object> previousChangedObjects = new ArrayDeque<Object>();
 
-    public MainControllerFragment() {
+    public ControllerFragment() {
     }
 
-    public static MainControllerFragment newInstance(int number) {
-        MainControllerFragment fragment = new MainControllerFragment();
+    public static ControllerFragment newInstance(int number) {
+        ControllerFragment fragment = new ControllerFragment();
         Bundle args = new Bundle();
         args.putInt("number", number);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -205,6 +222,11 @@ public class MainControllerFragment extends BaseFragment {
         mListener.onLocomotiveSelected();
     }
 
+    @Subscribe
+    public void onLocomotiveUpdated(Locomotive locomotive) {
+        locomotive1Seekbar.setProgress(locomotive.getCurrentSpeed());
+    }
+
     private void initNumberControlEventHandling() {
 
         for (int i = 0; i < 10; i++) {
@@ -212,22 +234,16 @@ public class MainControllerFragment extends BaseFragment {
             turnoutButton.setOnClickListener(new NumberButtonClickListener(i));
         }
 
-        Button defaultStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonDefault);
         defaultStateButton.setOnClickListener(new DefaultStateHandler());
 
-        Button nonDefaultStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonNonDefault);
         nonDefaultStateButton.setOnClickListener(new NonDefaultStateHandler());
 
-        Button leftStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonLeft);
         leftStateButton.setOnClickListener(new LeftStateHandler());
 
-        Button straightStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonStraight);
         straightStateButton.setOnClickListener(new StraightStateHandler());
 
-        Button rightStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonRight);
         rightStateButton.setOnClickListener(new RightStateHandler());
 
-        Button periodButton = (Button) fragmentView.findViewById(R.id.turnoutButtonPeriod);
         periodButton.setOnClickListener(new PeriodButtonHandler());
     }
 
@@ -296,17 +312,7 @@ public class MainControllerFragment extends BaseFragment {
     private class EmergencyStopListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            if (selectedLocomotive == null) {
-                return;
-            }
-
-            enqueueJob(new NetworkJob() {
-                @Override
-                public void onRun() throws Throwable {
-                    locomotiveController.emergencyStop(selectedLocomotive);
-                    locomotive1Seekbar.setProgress(0);
-                }
-            });
+            controllerPresenter.emergencyStop(selectedLocomotive);
 
         }
     }
@@ -314,15 +320,7 @@ public class MainControllerFragment extends BaseFragment {
     private class Locomotive1SpeedListener implements SeekBar.OnSeekBarChangeListener {
         @Override
         public void onProgressChanged(SeekBar seekBar, final int progress, boolean fromUser) {
-            if (selectedLocomotive == null) {
-                return;
-            }
-            enqueueJob(new NetworkJob() {
-                @Override
-                public void onRun() throws Throwable {
-                    locomotiveController.setSpeed(selectedLocomotive, progress, selectedLocomotive.getCurrentFunctions());
-                }
-            });
+            controllerPresenter.setSpeed(selectedLocomotive, progress);
         }
 
         @Override
@@ -337,32 +335,14 @@ public class MainControllerFragment extends BaseFragment {
     private class Locomotive1DirectionListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            if (selectedLocomotive == null) {
-                return;
-            }
-
-            enqueueJob(new NetworkJob() {
-                @Override
-                public void onRun() throws Throwable {
-                    locomotiveController.toggleDirection(selectedLocomotive);
-                }
-            });
+            controllerPresenter.toggleDirection(selectedLocomotive);
         }
     }
 
     private class Locomotive1StopListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            if (selectedLocomotive == null) {
-                return;
-            }
-            enqueueJob(new NetworkJob() {
-                @Override
-                public void onRun() throws Throwable {
-                    locomotiveController.setSpeed(selectedLocomotive, 0, selectedLocomotive.getCurrentFunctions());
-                    locomotive1Seekbar.setProgress(0);
-                }
-            });
+            controllerPresenter.stopLocomotive(selectedLocomotive);
         }
     }
 
@@ -576,17 +556,7 @@ public class MainControllerFragment extends BaseFragment {
 
         @Override
         public void onClick(View v) {
-            if (selectedLocomotive == null) {
-                return;
-            }
-
-            enqueueJob(new NetworkJob() {
-                @Override
-                public void onRun() throws Throwable {
-                    boolean currentFunctionValue = selectedLocomotive.getCurrentFunctions()[functionNumber];
-                    locomotiveController.setFunction(selectedLocomotive, functionNumber, !currentFunctionValue, 0);
-                }
-            });
+            controllerPresenter.toggleLocomotiveFunction(selectedLocomotive, functionNumber);
         }
     }
 }

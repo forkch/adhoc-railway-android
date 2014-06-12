@@ -21,8 +21,10 @@ import ch.fork.adhocrailway.android.activities.ConnectActivity;
 import ch.fork.adhocrailway.android.activities.ControllerActivity;
 import ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity;
 import ch.fork.adhocrailway.android.activities.SettingsActivity;
-import ch.fork.adhocrailway.android.fragments.MainControllerFragment;
+import ch.fork.adhocrailway.android.fragments.ControllerFragment;
 import ch.fork.adhocrailway.android.fragments.PowerFragment;
+import ch.fork.adhocrailway.android.presenters.ControllerPresenter;
+import ch.fork.adhocrailway.android.presenters.ControllerPresenterImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -36,8 +38,8 @@ import dagger.Provides;
                 ControllerActivity.class,
                 LocomotiveSelectActivity.class,
                 SettingsActivity.class,
-                MainControllerFragment.class,
-                PowerFragment.class}
+                ControllerFragment.class,
+                PowerFragment.class, ControllerPresenterImpl.class}
 )
 public class AdHocRailwayModule {
 
@@ -73,23 +75,32 @@ public class AdHocRailwayModule {
     }
 
     @Provides
+    @Singleton
     public TurnoutController providesTurnoutController() {
         return adHocRailwayApplication.getTurnoutController();
     }
 
     @Provides
+    @Singleton
     public RouteController providesRouteController() {
         return adHocRailwayApplication.getRouteController();
     }
 
     @Provides
+    @Singleton
     public LocomotiveController providesLocomotiveController() {
         return adHocRailwayApplication.getLocomotiveController();
     }
 
     @Provides
+    @Singleton
     public PowerController providesPowerController() {
         return adHocRailwayApplication.getPowerController();
+    }
+
+    @Provides
+    public ControllerPresenter providesControllerPresenter(AdHocRailwayApplication adHocRailwayApplication) {
+        return new ControllerPresenterImpl(adHocRailwayApplication);
     }
 
     @Provides

@@ -61,7 +61,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     public final static String TAG = AdHocRailwayApplication.class.getSimpleName();
     //private static final String SERVER_HOST = "adhocserver";
     public static final String SERVER_HOST = "forkch.dyndns.org";
-
+    protected ObjectGraph objectGraph;
     @Inject
     TurnoutManager turnoutManager;
     @Inject
@@ -70,7 +70,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     LocomotiveManager locomotiveManager;
     @Inject
     Bus bus;
-
     private SortedSet<LocomotiveGroup> locomotiveGroups;
     private Locomotive selectedLocomotive;
     private LocomotiveController locomotiveController;
@@ -81,7 +80,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     private SRCPSession session;
     private PowerSupply powerSupply;
     private JobManager jobManager;
-    private ObjectGraph objectGraph;
 
     @Override
     public void onCreate() {
@@ -111,7 +109,7 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         startJobManager.execute();
     }
 
-    private void setupDagger() {
+    protected void setupDagger() {
         Object[] modules = getModules().toArray();
         objectGraph = ObjectGraph.create(modules);
         objectGraph.inject(this);

@@ -22,10 +22,10 @@ import javax.inject.Inject;
 import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.events.InfoEvent;
-import ch.fork.adhocrailway.android.fragments.MainControllerFragment;
+import ch.fork.adhocrailway.android.fragments.ControllerFragment;
 import ch.fork.adhocrailway.android.fragments.PowerFragment;
 
-public class ControllerActivity extends BaseFragmentActivity implements MainControllerFragment.OnFragmentInteractionListener, PowerFragment.OnPowerFragmentInteractionListener {
+public class ControllerActivity extends BaseFragmentActivity implements ControllerFragment.OnFragmentInteractionListener, PowerFragment.OnPowerFragmentInteractionListener {
 
     private static final int NUM_CONTROLLER_FRAGMENTS = 4;
     @Inject
@@ -128,7 +128,7 @@ public class ControllerActivity extends BaseFragmentActivity implements MainCont
 
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        private final List<MainControllerFragment> fragments = new ArrayList<MainControllerFragment>();
+        private final List<ControllerFragment> fragments = new ArrayList<ControllerFragment>();
         private PowerFragment powerFragment;
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
@@ -136,7 +136,7 @@ public class ControllerActivity extends BaseFragmentActivity implements MainCont
 
             powerFragment = PowerFragment.newInstance();
             for (int i = 0; i < NUM_CONTROLLER_FRAGMENTS; i++) {
-                MainControllerFragment mainControllerFragment = MainControllerFragment.newInstance(i);
+                ControllerFragment mainControllerFragment = ControllerFragment.newInstance(i);
                 fragments.add(mainControllerFragment);
             }
         }
