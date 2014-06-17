@@ -1,4 +1,4 @@
-apply plugin: 'asndroid'
+apply plugin: 'android'
 apply plugin: 'maven'
 
 repositories {
