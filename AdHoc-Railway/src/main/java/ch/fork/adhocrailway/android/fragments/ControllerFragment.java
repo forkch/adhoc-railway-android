@@ -346,6 +346,19 @@ public class ControllerFragment extends BaseFragment {
         }
     }
 
+    private class FunctionButtonClickListener implements View.OnClickListener {
+        private int functionNumber;
+
+        public FunctionButtonClickListener(int functionNumber) {
+            this.functionNumber = functionNumber;
+        }
+
+        @Override
+        public void onClick(View v) {
+            controllerPresenter.toggleLocomotiveFunction(selectedLocomotive, functionNumber);
+        }
+    }
+
     private class SelectLocomotiveListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -355,15 +368,15 @@ public class ControllerFragment extends BaseFragment {
                 Toast.makeText(getActivity(), "Please stop locomotive first", Toast.LENGTH_SHORT).show();
             }
         }
-    }
 
+    }
     private class NumberButtonClickListener implements View.OnClickListener {
+
         private int number;
 
         public NumberButtonClickListener(int number) {
             this.number = number;
         }
-
         @Override
         public void onClick(View v) {
             enteredNumberKeys.append(number);
@@ -426,8 +439,8 @@ public class ControllerFragment extends BaseFragment {
         }
 
     }
-
     private class DefaultStateHandler extends NumberControlActionHandler {
+
         @Override
         public void onClick(View v) {
             if (StringUtils.isBlank(enteredNumberKeys.toString())) {
@@ -460,11 +473,11 @@ public class ControllerFragment extends BaseFragment {
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
             turnoutController.setDefaultState(turnout);
         }
-
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
             routeController.disableRoute(routeByNumber);
         }
+
     }
 
     private class NonDefaultStateHandler extends NumberControlActionHandler {
@@ -474,12 +487,12 @@ public class ControllerFragment extends BaseFragment {
             turnoutController.setNonDefaultState(turnout);
             storePreviousChangedObject(turnout);
         }
-
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
             routeController.enableRoute(routeByNumber);
             storePreviousChangedObject(routeByNumber);
         }
+
     }
 
     private class LeftStateHandler extends NumberControlActionHandler {
@@ -489,10 +502,10 @@ public class ControllerFragment extends BaseFragment {
             turnoutController.setCurvedLeft(turnout);
             storePreviousChangedObject(turnout);
         }
-
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
         }
+
     }
 
     private class StraightStateHandler extends NumberControlActionHandler {
@@ -501,10 +514,10 @@ public class ControllerFragment extends BaseFragment {
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
             turnoutController.setStraight(turnout);
         }
-
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
         }
+
     }
 
     private class RightStateHandler extends NumberControlActionHandler {
@@ -514,12 +527,11 @@ public class ControllerFragment extends BaseFragment {
             turnoutController.setCurvedRight(turnout);
             storePreviousChangedObject(turnout);
         }
-
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
         }
-    }
 
+    }
     private class PeriodButtonHandler implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -545,18 +557,6 @@ public class ControllerFragment extends BaseFragment {
                     break;
             }
         }
-    }
 
-    private class FunctionButtonClickListener implements View.OnClickListener {
-        private int functionNumber;
-
-        public FunctionButtonClickListener(int functionNumber) {
-            this.functionNumber = functionNumber;
-        }
-
-        @Override
-        public void onClick(View v) {
-            controllerPresenter.toggleLocomotiveFunction(selectedLocomotive, functionNumber);
-        }
     }
 }
