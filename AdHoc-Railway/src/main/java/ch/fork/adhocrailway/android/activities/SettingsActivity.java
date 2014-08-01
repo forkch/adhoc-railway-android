@@ -3,6 +3,7 @@ package ch.fork.adhocrailway.android.activities;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
+import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.fragments.SettingsFragment;
 
 /**
@@ -17,7 +18,8 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        AdHocRailwayApplication adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
+        adHocRailwayApplication.inject(this);
         // Display the fragment as the main content.
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())

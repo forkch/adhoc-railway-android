@@ -1,4 +1,5 @@
 language: android
+script: ./gradlew clean build
 android:
   components:
     - build-tools-20
@@ -8,3 +9,6 @@ android:
   licenses:
     - android-sdk-license-5be876d5 # new license!
     - '.*intel.+'
+  android_toolkit:   # below would be default values...
+    start_emulator: true
+    

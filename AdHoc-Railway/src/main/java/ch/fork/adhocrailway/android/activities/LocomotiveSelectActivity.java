@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.inject.Inject;
+
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.locomotives.LocomotiveGroup;
 import ch.fork.adhocrailway.android.AdHocRailwayApplication;
@@ -21,8 +23,10 @@ import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.adapters.LocomotiveListAdapter;
 
 
-public class LocomotiveSelectActivity extends ListActivity {
+public class LocomotiveSelectActivity extends BaseListActivity {
 
+    @Inject
+    AdHocRailwayApplication adHocRailwayApplication;
     private List<Locomotive> locomotives;
     private SortedSet<Locomotive> sortedLocomotives;
 
@@ -33,7 +37,6 @@ public class LocomotiveSelectActivity extends ListActivity {
 
         ListView listView = getListView();
 
-        final AdHocRailwayApplication adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
         sortedLocomotives = new TreeSet<Locomotive>();
 
         SortedSet<LocomotiveGroup> locomotiveGroups = adHocRailwayApplication.getLocomotiveGroups();

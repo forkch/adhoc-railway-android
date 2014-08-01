@@ -1,6 +1,5 @@
 package ch.fork.adhocrailway.android.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,8 +15,13 @@ import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import ch.fork.AdHocRailway.manager.LocomotiveManager;
+import ch.fork.AdHocRailway.manager.RouteManager;
+import ch.fork.AdHocRailway.manager.TurnoutManager;
 import ch.fork.AdHocRailway.manager.impl.events.LocomotivesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.RoutesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
@@ -26,15 +30,17 @@ import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.events.ConnectedToRailwayDeviceEvent;
 import ch.fork.adhocrailway.android.events.ExceptionEvent;
 import ch.fork.adhocrailway.android.events.InfoEvent;
+import ch.fork.adhocrailway.android.jobs.ConnectToPersistenceJob;
+import ch.fork.adhocrailway.android.jobs.ConnectToRailwayDeviceJob;
 
-public class ConnectActivity extends Activity {
+public class ConnectActivity extends BaseActivity {
 
     private static final String TAG = ConnectActivity.class.getSimpleName();
     @InjectView(R.id.connectButton)
     Button connectButton;
 
     @InjectView(R.id.connectingProgress)
-     ProgressBar connectingProgress;
+    ProgressBar connectingProgress;
     @InjectView(R.id.adhocServerHostTextView)
     TextView adHocServerHostTextView;
     @InjectView(R.id.srcpServerHostTextView)
@@ -43,7 +49,15 @@ public class ConnectActivity extends Activity {
     @InjectView(R.id.serversTextView)
     TextView serversTextView;
 
-    private AdHocRailwayApplication adHocRailwayApplication;
+
+    @Inject
+    TurnoutManager turnoutManager;
+    @Inject
+    RouteManager routeManager;
+    @Inject
+    LocomotiveManager locomotiveManager;
+    @Inject
+    AdHocRailwayApplication adHocRailwayApplication;
     private boolean locomotivesLoaded;
     private boolean routesLoaded;
     private boolean turnoutsLoaded;
@@ -65,7 +79,7 @@ public class ConnectActivity extends Activity {
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean dummyServers = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
-        if(dummyServers) {
+        if (dummyServers) {
             serversTextView.setText("Servers: DUMMY!!!");
         } else {
             serversTextView.setText("Servers:");
@@ -83,10 +97,33 @@ public class ConnectActivity extends Activity {
                 connectingProgress.setVisibility(View.VISIBLE);
                 connectButton.setEnabled(false);
                 adHocRailwayApplication.clearServers();
-                adHocRailwayApplication.connectToPersistence();
-                adHocRailwayApplication.connectToRailwayDevice();
+                connectToPersistence();
+                connectToRailwayDevice();
             }
         });
+    }
+
+    public void connectToRailwayDevice() {
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean useDummyServices = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
+
+        ConnectToRailwayDeviceJob connectToRailwayDeviceJob = new ConnectToRailwayDeviceJob(adHocRailwayApplication, useDummyServices, turnoutManager);
+        adHocRailwayApplication.getJobManager().addJobInBackground(connectToRailwayDeviceJob);
+    }
+
+    public void connectToPersistence() {
+        turnoutManager.addTurnoutManagerListener(adHocRailwayApplication);
+        routeManager.addRouteManagerListener(adHocRailwayApplication);
+        locomotiveManager.addLocomotiveManagerListener(adHocRailwayApplication);
+
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean useDummyServices = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
+
+        ConnectToPersistenceJob connectToPersistenceJob = new ConnectToPersistenceJob(adHocRailwayApplication, useDummyServices, turnoutManager, routeManager, locomotiveManager);
+
+        adHocRailwayApplication.getJobManager().addJobInBackground(connectToPersistenceJob);
     }
 
     @Subscribe
@@ -103,10 +140,10 @@ public class ConnectActivity extends Activity {
     protected void onStart() {
         super.onStart();
     }
+
     @Override
     protected void onResume() {
         super.onResume();
-        adHocRailwayApplication.getBus().register(this);
         initValues();
         locomotivesLoaded = false;
         turnoutsLoaded = false;
@@ -118,7 +155,6 @@ public class ConnectActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        adHocRailwayApplication.getBus().unregister(this);
     }
 
     @Override

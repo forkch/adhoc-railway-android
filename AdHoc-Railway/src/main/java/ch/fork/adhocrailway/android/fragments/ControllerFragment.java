@@ -2,9 +2,7 @@ package ch.fork.adhocrailway.android.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -18,14 +16,22 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.path.android.jobqueue.Job;
+import com.squareup.otto.Subscribe;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import ch.fork.AdHocRailway.controllers.LocomotiveController;
+import javax.inject.Inject;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
+import ch.fork.AdHocRailway.manager.RouteManager;
+import ch.fork.AdHocRailway.manager.TurnoutManager;
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.turnouts.Route;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
@@ -33,36 +39,72 @@ import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.activities.ControllerActivity;
 import ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity;
+import ch.fork.adhocrailway.android.jobs.NetworkJob;
+import ch.fork.adhocrailway.android.presenters.ControllerPresenter;
 import ch.fork.adhocrailway.android.utils.ImageHelper;
 
 
-public class MainControllerFragment extends Fragment implements NumberControlFragment.OnFragmentInteractionListener, LocomotiveControlFragment.OnFragmentInteractionListener {
+public class ControllerFragment extends BaseFragment {
 
-    private static final String TAG = MainControllerFragment.class.getSimpleName();
+    private static final String TAG = ControllerFragment.class.getSimpleName();
+    LinearLayout functionContainer;
+    @InjectView(R.id.locomotive1Speed)
+    SeekBar locomotive1Seekbar;
+    @InjectView(R.id.locomotive1Direction)
+    Button directionButton;
+    @InjectView(R.id.locomotive1Stop)
+    Button stopButton;
+    @InjectView(R.id.locomotiveEmergencyStop)
+    Button emergencyStopButton;
+    @InjectView(R.id.selectedLocomotive)
+    LinearLayout selectedLocomotiveView;
+
+    @InjectView(R.id.turnoutButtonDefault)
+    Button defaultStateButton;
+    @InjectView(R.id.turnoutButtonNonDefault)
+    Button nonDefaultStateButton;
+    @InjectView(R.id.turnoutButtonLeft)
+    Button leftStateButton;
+
+    @InjectView(R.id.turnoutButtonRight)
+    Button rightStateButton;
+    @InjectView(R.id.turnoutButtonStraight)
+    Button straightStateButton;
+    @InjectView(R.id.turnoutButtonPeriod)
+    Button periodButton;
+
+    @Inject
+    TurnoutManager turnoutManager;
+    @Inject
+    RouteManager routeManager;
+    @Inject
+    TurnoutController turnoutController;
+    @Inject
+    RouteController routeController;
+    @Inject
+    AdHocRailwayApplication adHocRailwayApplication;
+    @Inject
+    ControllerPresenter controllerPresenter;
+
     private OnFragmentInteractionListener mListener;
     private View fragmentView;
     private int number;
-    private AdHocRailwayApplication adHocRailwayApplication;
     private Locomotive selectedLocomotive;
-    private LinearLayout selectedLocomotiveView;
     private StringBuffer enteredNumberKeys = new StringBuffer();
     private TextView currentNumber;
     private NumberControlState numberControlState = NumberControlState.TURNOUT;
     private TextView routeIndicator;
     private Deque<Object> previousChangedObjects = new ArrayDeque<Object>();
-    private SeekBar locomotive1Seekbar;
-    private Button directionButton;
-    private Button stopButton;
-    private Button emergencyStopButton;
 
-    public MainControllerFragment() {
+    public ControllerFragment() {
     }
 
-    public static MainControllerFragment newInstance(int number) {
-        MainControllerFragment fragment = new MainControllerFragment();
+    public static ControllerFragment newInstance(int number) {
+        ControllerFragment fragment = new ControllerFragment();
         Bundle args = new Bundle();
         args.putInt("number", number);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -87,10 +129,10 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fragmentView = inflater.inflate(R.layout.fragment_main_controller, container, false);
+        ButterKnife.inject(this, fragmentView);
         currentNumber = (TextView) fragmentView.findViewById(R.id.currentNumber);
         routeIndicator = (TextView) fragmentView.findViewById(R.id.routeIndicator);
 
-        selectedLocomotiveView = (LinearLayout) fragmentView.findViewById(R.id.selectedLocomotive);
         initNumberControlEventHandling();
         initLocomotiveEventHandling();
 
@@ -112,7 +154,6 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
     @Override
     public void onResume() {
         super.onResume();
-        adHocRailwayApplication = (AdHocRailwayApplication) getActivity().getApplication();
         updateSelectedLocomotive();
     }
 
@@ -131,7 +172,6 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        adHocRailwayApplication = (AdHocRailwayApplication) getActivity().getApplication();
         if (savedInstanceState != null && savedInstanceState.containsKey("selectedLocomotive")) {
             selectedLocomotive = (Locomotive) savedInstanceState.getSerializable("selectedLocomotive");
             if (selectedLocomotive != null) {
@@ -144,23 +184,23 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
         selectedLocomotiveView.setOnClickListener(new SelectLocomotiveListener());
 
-        locomotive1Seekbar = (SeekBar) fragmentView.findViewById(R.id.locomotive1Speed);
         locomotive1Seekbar.setOnSeekBarChangeListener(new Locomotive1SpeedListener());
 
-        directionButton = (Button) fragmentView.findViewById(R.id.locomotive1Direction);
         directionButton.setOnClickListener(new Locomotive1DirectionListener());
 
-        stopButton = (Button) fragmentView.findViewById(R.id.locomotive1Stop);
         stopButton.setOnClickListener(new Locomotive1StopListener());
 
-        emergencyStopButton = (Button) fragmentView.findViewById(R.id.locomotiveEmergencyStop);
         emergencyStopButton.setOnClickListener(new EmergencyStopListener());
 
-        for (int i = 0; i < 5; i++) {
-            Button functionButton = (Button) fragmentView.findViewById(getResources().getIdentifier("locomotive1F" + i, "id", getActivity().getPackageName()));
-            if (functionButton != null) {
-                //some layout have no function buttons
-                functionButton.setOnClickListener(new FunctionButtonClickListener(i));
+        functionContainer = (LinearLayout) fragmentView.findViewById(R.id.functionContainer);
+
+        if (functionContainer != null) {
+            for (int i = 0; i < 5; i++) {
+                Button functionButton = (Button) fragmentView.findViewById(getResources().getIdentifier("locomotive1F" + i, "id", getActivity().getPackageName()));
+                if (functionButton != null) {
+                    //some layout have no function buttons
+                    functionButton.setOnClickListener(new FunctionButtonClickListener(i));
+                }
             }
         }
     }
@@ -182,6 +222,11 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         mListener.onLocomotiveSelected();
     }
 
+    @Subscribe
+    public void onLocomotiveUpdated(Locomotive locomotive) {
+        locomotive1Seekbar.setProgress(locomotive.getCurrentSpeed());
+    }
+
     private void initNumberControlEventHandling() {
 
         for (int i = 0; i < 10; i++) {
@@ -189,22 +234,16 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
             turnoutButton.setOnClickListener(new NumberButtonClickListener(i));
         }
 
-        Button defaultStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonDefault);
         defaultStateButton.setOnClickListener(new DefaultStateHandler());
 
-        Button nonDefaultStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonNonDefault);
         nonDefaultStateButton.setOnClickListener(new NonDefaultStateHandler());
 
-        Button leftStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonLeft);
         leftStateButton.setOnClickListener(new LeftStateHandler());
 
-        Button straightStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonStraight);
         straightStateButton.setOnClickListener(new StraightStateHandler());
 
-        Button rightStateButton = (Button) fragmentView.findViewById(R.id.turnoutButtonRight);
         rightStateButton.setOnClickListener(new RightStateHandler());
 
-        Button periodButton = (Button) fragmentView.findViewById(R.id.turnoutButtonPeriod);
         periodButton.setOnClickListener(new PeriodButtonHandler());
     }
 
@@ -258,6 +297,10 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
 
     }
 
+    private void enqueueJob(Job job) {
+        adHocRailwayApplication.getJobManager().addJobInBackground(job);
+    }
+
     private enum NumberControlState {
         TURNOUT, ROUTE, LOCOMOTIVE_FUNCTION;
     }
@@ -269,39 +312,15 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
     private class EmergencyStopListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            if (selectedLocomotive == null) {
-                return;
-            }
+            controllerPresenter.emergencyStop(selectedLocomotive);
 
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
-                @Override
-                protected Void doInBackground(Void... params) {
-                    adHocRailwayApplication.getLocomotiveController().emergencyStop(selectedLocomotive);
-                    locomotive1Seekbar.setProgress(0);
-                    return null;
-                }
-            };
-            asyncTask.execute();
         }
     }
 
     private class Locomotive1SpeedListener implements SeekBar.OnSeekBarChangeListener {
         @Override
         public void onProgressChanged(SeekBar seekBar, final int progress, boolean fromUser) {
-            if (selectedLocomotive == null) {
-                return;
-            }
-
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
-                @Override
-                protected Void doInBackground(Void... params) {
-                    adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, progress, selectedLocomotive.getCurrentFunctions());
-                    return null;
-                }
-            };
-            asyncTask.execute();
+            controllerPresenter.setSpeed(selectedLocomotive, progress);
         }
 
         @Override
@@ -316,38 +335,27 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
     private class Locomotive1DirectionListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            if (selectedLocomotive == null) {
-                return;
-            }
-
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
-                @Override
-                protected Void doInBackground(Void... params) {
-                    adHocRailwayApplication.getLocomotiveController().toggleDirection(selectedLocomotive);
-                    return null;
-                }
-            };
-            asyncTask.execute();
+            controllerPresenter.toggleDirection(selectedLocomotive);
         }
     }
 
     private class Locomotive1StopListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            if (selectedLocomotive == null) {
-                return;
-            }
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+            controllerPresenter.stopLocomotive(selectedLocomotive);
+        }
+    }
 
-                @Override
-                protected Void doInBackground(Void... params) {
-                    adHocRailwayApplication.getLocomotiveController().setSpeed(selectedLocomotive, 0, selectedLocomotive.getCurrentFunctions());
-                    locomotive1Seekbar.setProgress(0);
-                    return null;
-                }
-            };
-            asyncTask.execute();
+    private class FunctionButtonClickListener implements View.OnClickListener {
+        private int functionNumber;
+
+        public FunctionButtonClickListener(int functionNumber) {
+            this.functionNumber = functionNumber;
+        }
+
+        @Override
+        public void onClick(View v) {
+            controllerPresenter.toggleLocomotiveFunction(selectedLocomotive, functionNumber);
         }
     }
 
@@ -360,15 +368,15 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                 Toast.makeText(getActivity(), "Please stop locomotive first", Toast.LENGTH_SHORT).show();
             }
         }
-    }
 
+    }
     private class NumberButtonClickListener implements View.OnClickListener {
+
         private int number;
 
         public NumberButtonClickListener(int number) {
             this.number = number;
         }
-
         @Override
         public void onClick(View v) {
             enteredNumberKeys.append(number);
@@ -389,47 +397,50 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         protected abstract void doPerformStateAction(RouteController routeController, Route routeByNumber);
 
         protected void storePreviousChangedObject(Object obj) {
-            previousChangedObjects.addFirst(obj);
+            previousChangedObjects.addLast(obj);
             updatePreviousChangedObject();
         }
 
         @Override
         public void onClick(View v) {
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
+            enqueueJob(new NetworkJob() {
                 @Override
-                protected Void doInBackground(Void... params) {
+                public void onRun() throws Throwable {
                     int enteredNumber = getEnteredNumber();
                     if (enteredNumber == -1) {
-                        return null;
+                        return;
                     }
                     if (numberControlState == NumberControlState.TURNOUT) {
-                        Turnout turnoutByNumber = adHocRailwayApplication.getTurnoutManager().getTurnoutByNumber(enteredNumber);
-                        if (turnoutByNumber == null) {
-                            resetNumbers();
-                            return null;
-                        }
-                        TurnoutController turnoutController = adHocRailwayApplication.getTurnoutController();
-                        doPerformStateAction(turnoutController, turnoutByNumber);
+                        handleTurnoutChange(enteredNumber);
                     } else {
-                        Route routeByNumber = adHocRailwayApplication.getRouteManager().getRouteByNumber(enteredNumber);
-                        if (routeByNumber == null) {
-                            resetNumbers();
-                            return null;
-                        }
-                        RouteController routeController = adHocRailwayApplication.getRouteController();
-                        doPerformStateAction(routeController, routeByNumber);
+                        handleRouteChange(enteredNumber);
                     }
                     resetNumbers();
-                    return null;
                 }
-            };
-            asyncTask.execute();
+
+                private void handleRouteChange(int enteredNumber) {
+                    Route routeByNumber = routeManager.getRouteByNumber(enteredNumber);
+                    if (routeByNumber == null) {
+                        resetNumbers();
+                        return;
+                    }
+                    doPerformStateAction(routeController, routeByNumber);
+                }
+
+                private void handleTurnoutChange(int enteredNumber) {
+                    Turnout turnoutByNumber = turnoutManager.getTurnoutByNumber(enteredNumber);
+                    if (turnoutByNumber == null) {
+                        resetNumbers();
+                        return;
+                    }
+                    doPerformStateAction(turnoutController, turnoutByNumber);
+                }
+            });
         }
 
     }
-
     private class DefaultStateHandler extends NumberControlActionHandler {
+
         @Override
         public void onClick(View v) {
             if (StringUtils.isBlank(enteredNumberKeys.toString())) {
@@ -441,21 +452,18 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                 if (obj == null) {
                     return;
                 }
-                AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground(Void... params) {
-
-                        if (obj instanceof Turnout) {
-                            doPerformStateAction(adHocRailwayApplication.getTurnoutController(), (Turnout) obj);
-                        } else {
-                            doPerformStateAction(adHocRailwayApplication.getRouteController(), (Route) obj);
-                        }
-                        updatePreviousChangedObject();
-                        return null;
-                    }
-                };
-                asyncTask.execute();
+                enqueueJob(new NetworkJob() {
+                               @Override
+                               public void onRun() throws Throwable {
+                                   if (obj instanceof Turnout) {
+                                       doPerformStateAction(turnoutController, (Turnout) obj);
+                                   } else {
+                                       doPerformStateAction(routeController, (Route) obj);
+                                   }
+                                   updatePreviousChangedObject();
+                               }
+                           }
+                );
             } else {
                 super.onClick(v);
             }
@@ -465,11 +473,11 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
             turnoutController.setDefaultState(turnout);
         }
-
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
             routeController.disableRoute(routeByNumber);
         }
+
     }
 
     private class NonDefaultStateHandler extends NumberControlActionHandler {
@@ -479,12 +487,12 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
             turnoutController.setNonDefaultState(turnout);
             storePreviousChangedObject(turnout);
         }
-
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
             routeController.enableRoute(routeByNumber);
             storePreviousChangedObject(routeByNumber);
         }
+
     }
 
     private class LeftStateHandler extends NumberControlActionHandler {
@@ -494,10 +502,10 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
             turnoutController.setCurvedLeft(turnout);
             storePreviousChangedObject(turnout);
         }
-
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
         }
+
     }
 
     private class StraightStateHandler extends NumberControlActionHandler {
@@ -506,10 +514,10 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
             turnoutController.setStraight(turnout);
         }
-
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
         }
+
     }
 
     private class RightStateHandler extends NumberControlActionHandler {
@@ -519,12 +527,11 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
             turnoutController.setCurvedRight(turnout);
             storePreviousChangedObject(turnout);
         }
-
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
         }
-    }
 
+    }
     private class PeriodButtonHandler implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -550,34 +557,6 @@ public class MainControllerFragment extends Fragment implements NumberControlFra
                     break;
             }
         }
-    }
 
-
-    private class FunctionButtonClickListener implements View.OnClickListener {
-        private int functionNumber;
-
-        public FunctionButtonClickListener(int functionNumber) {
-            this.functionNumber = functionNumber;
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (selectedLocomotive == null) {
-                return;
-            }
-
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
-                @Override
-                protected Void doInBackground(Void... params) {
-                    LocomotiveController locomotiveController = adHocRailwayApplication.getLocomotiveController();
-                    boolean currentFunctionValue = selectedLocomotive.getCurrentFunctions()[functionNumber];
-                    locomotiveController.setFunction(selectedLocomotive, functionNumber, !currentFunctionValue, 0);
-                    return null;
-                }
-            };
-            asyncTask.execute();
-
-        }
     }
 }

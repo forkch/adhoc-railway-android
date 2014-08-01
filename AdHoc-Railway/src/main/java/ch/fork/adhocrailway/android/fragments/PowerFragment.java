@@ -13,6 +13,8 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import ch.fork.AdHocRailway.controllers.PowerChangeListener;
 import ch.fork.AdHocRailway.controllers.PowerController;
 import ch.fork.AdHocRailway.model.power.Booster;
@@ -22,9 +24,12 @@ import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.R;
 
 public class PowerFragment extends Fragment implements PowerChangeListener {
+    @Inject
+    PowerController powerController;
+    @Inject
+    AdHocRailwayApplication adHocRailwayApplication;
     private OnPowerFragmentInteractionListener mListener;
     private View fragmentView;
-    private AdHocRailwayApplication adHocRailwayApplication;
     private List<Button> boosterButtons = Lists.newArrayList();
 
 
@@ -96,18 +101,25 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
     }
 
     @Override
-    public void powerChanged(PowerSupply supply) {
-        if (supply == null) {
-            return;
-        }
-        for (Booster booster : supply.getBoosters()) {
-            Button button = boosterButtons.get(booster.getBoosterNumber());
-            if (booster.getState() == BoosterState.ACTIVE) {
-                button.setBackgroundResource(R.drawable.bring_button_primary);
-            } else {
-                button.setBackgroundResource(R.drawable.bring_button_alert);
+    public void powerChanged(final PowerSupply supply) {
+        fragmentView.post(new Runnable() {
+            @Override
+            public void run() {
+
+                if (supply == null) {
+                    return;
+                }
+                for (Booster booster : supply.getBoosters()) {
+                    Button button = boosterButtons.get(booster.getBoosterNumber());
+                    if (booster.getState() == BoosterState.ACTIVE) {
+                        button.setBackgroundResource(R.drawable.bring_button_primary);
+                    } else {
+                        button.setBackgroundResource(R.drawable.bring_button_alert);
+                    }
+                }
             }
-        }
+        });
+
     }
 
     public interface OnPowerFragmentInteractionListener {
@@ -125,7 +137,6 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
             AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    PowerController powerController = adHocRailwayApplication.getPowerController();
                     powerController.toggleBooster(adHocRailwayApplication.getPowerSupply().getBooster(boosterNumber));
                     return null;
                 }
