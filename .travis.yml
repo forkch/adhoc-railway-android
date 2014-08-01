@@ -1,5 +1,5 @@
 language: android
-script: ./gradlew clean build
+
 android:
   components:
     - build-tools-20
@@ -7,4 +7,4 @@ android:
     - sysimg-19
     - extra-android-support
   licenses:
-    - android-sdk-license-5be876d5 # new license!
+    - android-sdk-license-5be876d5
