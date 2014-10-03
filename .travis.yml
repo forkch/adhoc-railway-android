@@ -2,9 +2,6 @@ language: android
 
 android:
   components:
-    - build-tools-20.0.0
-    - android-19
-    - sysimg-19
-    - extra-android-support
+  - build-tools-20.0.0
   licenses:
     - android-sdk-license-5be876d5
