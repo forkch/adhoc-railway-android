@@ -1,11 +1,7 @@
 language: android
 
-script: ./gradlew clean build
-
-
 android:
   components:
-    - build-tools-19.1.0
-
-android_toolkit:   # below would be default values...
-  start_emulator: true
+  - build-tools-20.0.0
+  licenses:
+    - android-sdk-license-5be876d5
