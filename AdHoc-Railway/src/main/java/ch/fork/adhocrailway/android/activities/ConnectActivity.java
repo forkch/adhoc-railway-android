@@ -26,7 +26,9 @@ import ch.fork.AdHocRailway.manager.impl.events.LocomotivesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.RoutesUpdatedEvent;
 import ch.fork.AdHocRailway.manager.impl.events.TurnoutsUpdatedEvent;
 import ch.fork.adhocrailway.android.AdHocRailwayApplication;
+import ch.fork.adhocrailway.android.PersistenceContext;
 import ch.fork.adhocrailway.android.R;
+import ch.fork.adhocrailway.android.RailwayDeviceContext;
 import ch.fork.adhocrailway.android.events.ConnectedToRailwayDeviceEvent;
 import ch.fork.adhocrailway.android.events.ExceptionEvent;
 import ch.fork.adhocrailway.android.events.InfoEvent;
@@ -49,15 +51,12 @@ public class ConnectActivity extends BaseActivity {
     @InjectView(R.id.serversTextView)
     TextView serversTextView;
 
-
-    @Inject
-    TurnoutManager turnoutManager;
-    @Inject
-    RouteManager routeManager;
-    @Inject
-    LocomotiveManager locomotiveManager;
     @Inject
     AdHocRailwayApplication adHocRailwayApplication;
+    @Inject
+    PersistenceContext persistenceContext;
+    @Inject
+    RailwayDeviceContext railwayDeviceContext;
     private boolean locomotivesLoaded;
     private boolean routesLoaded;
     private boolean turnoutsLoaded;
@@ -108,20 +107,17 @@ public class ConnectActivity extends BaseActivity {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean useDummyServices = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
 
-        ConnectToRailwayDeviceJob connectToRailwayDeviceJob = new ConnectToRailwayDeviceJob(adHocRailwayApplication, useDummyServices, turnoutManager);
+        ConnectToRailwayDeviceJob connectToRailwayDeviceJob = new ConnectToRailwayDeviceJob(adHocRailwayApplication, useDummyServices, railwayDeviceContext, persistenceContext);
         adHocRailwayApplication.getJobManager().addJobInBackground(connectToRailwayDeviceJob);
     }
 
     public void connectToPersistence() {
-        turnoutManager.addTurnoutManagerListener(adHocRailwayApplication);
-        routeManager.addRouteManagerListener(adHocRailwayApplication);
-        locomotiveManager.addLocomotiveManagerListener(adHocRailwayApplication);
 
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean useDummyServices = sharedPref.getBoolean(SettingsActivity.KEY_USE_DUMMY_SERVICES, false);
 
-        ConnectToPersistenceJob connectToPersistenceJob = new ConnectToPersistenceJob(adHocRailwayApplication, useDummyServices, turnoutManager, routeManager, locomotiveManager);
+        ConnectToPersistenceJob connectToPersistenceJob = new ConnectToPersistenceJob(adHocRailwayApplication, useDummyServices, persistenceContext);
 
         adHocRailwayApplication.getJobManager().addJobInBackground(connectToPersistenceJob);
     }

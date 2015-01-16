@@ -11,14 +11,15 @@ import ch.fork.AdHocRailway.controllers.impl.dummy.DummyLocomotiveController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyPowerController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyRouteController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyTurnoutController;
-import ch.fork.AdHocRailway.manager.TurnoutManager;
 import ch.fork.AdHocRailway.model.power.PowerSupply;
 import ch.fork.AdHocRailway.railway.srcp.SRCPLocomotiveControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPPowerControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPRouteControlAdapter;
 import ch.fork.AdHocRailway.railway.srcp.SRCPTurnoutControlAdapter;
 import ch.fork.adhocrailway.android.AdHocRailwayApplication;
+import ch.fork.adhocrailway.android.PersistenceContext;
 import ch.fork.adhocrailway.android.R;
+import ch.fork.adhocrailway.android.RailwayDeviceContext;
 import ch.fork.adhocrailway.android.activities.SettingsActivity;
 import ch.fork.adhocrailway.android.events.ConnectedToRailwayDeviceEvent;
 import ch.fork.adhocrailway.android.events.ExceptionEvent;
@@ -31,19 +32,17 @@ import de.dermoba.srcp.common.exception.SRCPException;
 public class ConnectToRailwayDeviceJob extends NetworkJob {
     private final AdHocRailwayApplication adHocRailwayApplication;
     private final boolean useDummyServices;
-    private TurnoutController turnoutController;
-    private RouteController routeController;
-    private LocomotiveController locomotiveController;
-    private PowerController powerController;
-    private TurnoutManager turnoutManager;
-    private PowerSupply powerSupply;
+    private final PersistenceContext persistenceContext;
+    private RailwayDeviceContext railwayDeviceContext;
 
-    public ConnectToRailwayDeviceJob(AdHocRailwayApplication adHocRailwayApplication, boolean useDummyServices, TurnoutManager turnoutManager) {
+    public ConnectToRailwayDeviceJob(AdHocRailwayApplication adHocRailwayApplication, boolean useDummyServices, RailwayDeviceContext railwayDeviceContext, PersistenceContext persistenceContext) {
         super();
         this.adHocRailwayApplication = adHocRailwayApplication;
         this.useDummyServices = useDummyServices;
-        this.turnoutManager = turnoutManager;
+        this.railwayDeviceContext = railwayDeviceContext;
+        this.persistenceContext = persistenceContext;
     }
+
     @Override
     public void onRun() throws Throwable {
         if (useDummyServices) {
@@ -54,12 +53,12 @@ public class ConnectToRailwayDeviceJob extends NetworkJob {
     }
 
     private void connectToDummySrcpService() {
-        turnoutController = new DummyTurnoutController();
-        routeController = new DummyRouteController(turnoutController, turnoutManager);
-        locomotiveController = new DummyLocomotiveController();
-        powerController = new DummyPowerController();
+        TurnoutController turnoutController = new DummyTurnoutController();
+        RouteController routeController = new DummyRouteController(turnoutController, persistenceContext.getTurnoutManager());
+        LocomotiveController locomotiveController = new DummyLocomotiveController();
+        PowerController powerController = new DummyPowerController();
 
-        adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true, turnoutController, routeController, locomotiveController, powerController, new PowerSupply(1), null));
+        adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true));
     }
 
     private void connectToSrcpd() {
@@ -72,7 +71,7 @@ public class ConnectToRailwayDeviceJob extends NetworkJob {
             session.connect();
 
             SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter();
-            SRCPRouteControlAdapter srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter, turnoutManager);
+            SRCPRouteControlAdapter srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter, persistenceContext.getTurnoutManager());
             SRCPLocomotiveControlAdapter srcpLocomotiveControlAdapter = new SRCPLocomotiveControlAdapter();
             SRCPPowerControlAdapter srcpPowerControlAdapter = new SRCPPowerControlAdapter();
 
@@ -81,18 +80,26 @@ public class ConnectToRailwayDeviceJob extends NetworkJob {
             srcpLocomotiveControlAdapter.setSession(session);
             srcpPowerControlAdapter.setSession(session);
 
-            powerSupply = new PowerSupply(1);
+            PowerSupply powerSupply = new PowerSupply(1);
             srcpPowerControlAdapter.addOrUpdatePowerSupply(powerSupply);
 
 
             srcpRouteControlAdapter.setRoutingDelay(500);
 
-            locomotiveController = srcpLocomotiveControlAdapter;
-            turnoutController = srcpTurnoutControlAdapter;
-            routeController = srcpRouteControlAdapter;
-            powerController = srcpPowerControlAdapter;
+            LocomotiveController locomotiveController = srcpLocomotiveControlAdapter;
+            TurnoutController turnoutController = srcpTurnoutControlAdapter;
+            RouteController routeController = srcpRouteControlAdapter;
+            PowerController powerController = srcpPowerControlAdapter;
 
-            adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true, turnoutController, routeController, locomotiveController, powerController, powerSupply, session));
+
+            railwayDeviceContext.setLocomotiveController(locomotiveController);
+            railwayDeviceContext.setTurnoutController(turnoutController);
+            railwayDeviceContext.setRouteController(routeController);
+            railwayDeviceContext.setPowerController(powerController);
+            railwayDeviceContext.setPowerSupply(powerSupply);
+            railwayDeviceContext.setSRCPSession(session);
+
+            adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true));
         } catch (SRCPException e) {
             adHocRailwayApplication.postEvent(new ExceptionEvent(adHocRailwayApplication.getString(R.string.error_failed_to_connect_srcpserver), e));
             adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(false));

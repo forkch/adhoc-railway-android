@@ -28,6 +28,7 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import ch.fork.AdHocRailway.controllers.LocomotiveController;
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.manager.RouteManager;
@@ -77,6 +78,8 @@ public class ControllerFragment extends BaseFragment {
     TurnoutManager turnoutManager;
     @Inject
     RouteManager routeManager;
+    @Inject
+    LocomotiveController locomotiveController;
     @Inject
     TurnoutController turnoutController;
     @Inject
@@ -212,7 +215,7 @@ public class ControllerFragment extends BaseFragment {
         if (selectedLocomotive != null) {
             label.setText(selectedLocomotive.getName());
             ImageHelper.fillImageViewFromBase64ImageString(imageView, selectedLocomotive.getImageBase64());
-            adHocRailwayApplication.getLocomotiveController().activateLoco(selectedLocomotive);
+            locomotiveController.activateLoco(selectedLocomotive);
 
         } else {
             label.setText("select locomotive");

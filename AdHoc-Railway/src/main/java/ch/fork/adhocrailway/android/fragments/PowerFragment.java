@@ -49,6 +49,8 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+
+
     }
 
     @Override
@@ -90,8 +92,9 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
     public void onResume() {
         super.onResume();
         adHocRailwayApplication = (AdHocRailwayApplication) getActivity().getApplication();
-        adHocRailwayApplication.getPowerController().addPowerChangeListener(this);
-        powerChanged(adHocRailwayApplication.getPowerController().getPowerSupply(1));
+        adHocRailwayApplication.inject(this);
+        powerController.addPowerChangeListener(this);
+        powerChanged(powerController.getPowerSupply(1));
     }
 
     @Override
@@ -137,7 +140,7 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
             AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    powerController.toggleBooster(adHocRailwayApplication.getPowerSupply().getBooster(boosterNumber));
+                    powerController.toggleBooster(powerController.getPowerSupply(1).getBooster(boosterNumber));
                     return null;
                 }
 
@@ -152,8 +155,7 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
             AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    PowerController powerController = adHocRailwayApplication.getPowerController();
-                    powerController.powerOn(adHocRailwayApplication.getPowerSupply());
+                    powerController.powerOn(powerController.getPowerSupply(1));
                     return null;
                 }
 
@@ -168,8 +170,7 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
             AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    PowerController powerController = adHocRailwayApplication.getPowerController();
-                    powerController.powerOff(adHocRailwayApplication.getPowerSupply());
+                    powerController.powerOff(powerController.getPowerSupply(1));
                     return null;
                 }
 

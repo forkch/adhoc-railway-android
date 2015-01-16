@@ -63,22 +63,13 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
     public static final String SERVER_HOST = "forkch.dyndns.org";
     protected ObjectGraph objectGraph;
     @Inject
-    TurnoutManager turnoutManager;
-    @Inject
-    RouteManager routeManager;
-    @Inject
-    LocomotiveManager locomotiveManager;
-    @Inject
     Bus bus;
+    @Inject
+    RailwayDeviceContext railwayDeviceContext;
+    @Inject
+    PersistenceContext persistenceContext;
     private SortedSet<LocomotiveGroup> locomotiveGroups;
     private Locomotive selectedLocomotive;
-    private LocomotiveController locomotiveController;
-    private TurnoutController turnoutController;
-    private RouteController routeController;
-    private PowerController powerController;
-    private Handler handler;
-    private SRCPSession session;
-    private PowerSupply powerSupply;
     private JobManager jobManager;
 
     @Override
@@ -91,8 +82,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
         //ConfigureLog4J.configure();
         bus.register(this);
-        handler = new Handler();
-
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {
@@ -182,42 +171,17 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
         this.selectedLocomotive = selectedLocomotive;
     }
 
-
-    public TurnoutController getTurnoutController() {
-        return turnoutController;
-    }
-
-    public RouteController getRouteController() {
-        return routeController;
-    }
-
-    public LocomotiveController getLocomotiveController() {
-        return locomotiveController;
-    }
-
-    public PowerController getPowerController() {
-        return powerController;
-    }
-
-    public PowerSupply getPowerSupply() {
-        return powerSupply;
-    }
-
     public void clearServers() {
-        if (turnoutManager != null)
-            turnoutManager.disconnect();
-        if (routeManager != null)
-            routeManager.disconnect();
-        if (locomotiveManager != null)
-            locomotiveManager.disconnect();
-
-        turnoutController = null;
-        routeController = null;
-        locomotiveController = null;
+        if (persistenceContext.getTurnoutManager() != null)
+            persistenceContext.getTurnoutManager().disconnect();
+        if (persistenceContext.getRouteManager() != null)
+            persistenceContext.getRouteManager().disconnect();
+        if (persistenceContext.getLocomotiveManager() != null)
+            persistenceContext.getLocomotiveManager().disconnect();
 
         try {
-            if (session != null)
-                session.disconnect();
+            if (railwayDeviceContext.getSRCPSession() != null)
+                railwayDeviceContext.getSRCPSession().disconnect();
         } catch (SRCPException e) {
             e.printStackTrace();
         }
@@ -225,14 +189,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     @Subscribe
     public void connectedEvent(ConnectedToRailwayDeviceEvent event) {
-        if (event.isConnected()) {
-            locomotiveController = event.getLocomotiveController();
-            turnoutController = event.getTurnoutController();
-            routeController = event.getRouteController();
-            powerController = event.getPowerController();
-            powerSupply = event.getPowerSupply();
-            session = event.getSession();
-        }
     }
 
     @Override
@@ -356,12 +312,6 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     public void postEvent(final Object event) {
         bus.post(event);
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                bus.post(event);
-            }
-        });
     }
 
     public JobManager getJobManager() {

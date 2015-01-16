@@ -11,6 +11,9 @@ import java.util.UUID;
 import ch.fork.AdHocRailway.manager.LocomotiveManager;
 import ch.fork.AdHocRailway.manager.RouteManager;
 import ch.fork.AdHocRailway.manager.TurnoutManager;
+import ch.fork.AdHocRailway.manager.impl.LocomotiveManagerImpl;
+import ch.fork.AdHocRailway.manager.impl.RouteManagerImpl;
+import ch.fork.AdHocRailway.manager.impl.TurnoutManagerImpl;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestLocomotiveService;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestRouteService;
 import ch.fork.AdHocRailway.persistence.adhocserver.impl.rest.RestTurnoutService;
@@ -22,6 +25,7 @@ import ch.fork.AdHocRailway.persistence.xml.impl.XMLRouteService;
 import ch.fork.AdHocRailway.persistence.xml.impl.XMLTurnoutService;
 import ch.fork.AdHocRailway.services.AdHocServiceException;
 import ch.fork.adhocrailway.android.AdHocRailwayApplication;
+import ch.fork.adhocrailway.android.PersistenceContext;
 import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.activities.SettingsActivity;
 import ch.fork.adhocrailway.android.events.ExceptionEvent;
@@ -32,19 +36,15 @@ import ch.fork.adhocrailway.android.events.InfoEvent;
  */
 public class ConnectToPersistenceJob extends NetworkJob implements ServiceListener {
     public final static String TAG = AdHocRailwayApplication.class.getSimpleName();
-    private final TurnoutManager turnoutManager;
-    private final RouteManager routeManager;
-    private final LocomotiveManager locomotiveManager;
+    private final PersistenceContext persistenceContext;
     private AdHocRailwayApplication adHocRailwayApplication;
     private boolean useDummyServices;
 
-    public ConnectToPersistenceJob(AdHocRailwayApplication adHocRailwayApplication, boolean useDummyServices, TurnoutManager turnoutManager, RouteManager routeManager, LocomotiveManager locomotiveManager) {
+    public ConnectToPersistenceJob(AdHocRailwayApplication adHocRailwayApplication, boolean useDummyServices, PersistenceContext persistenceContext) {
         super();
         this.adHocRailwayApplication = adHocRailwayApplication;
         this.useDummyServices = useDummyServices;
-        this.turnoutManager = turnoutManager;
-        this.routeManager = routeManager;
-        this.locomotiveManager = locomotiveManager;
+        this.persistenceContext = persistenceContext;
     }
 
 
@@ -56,20 +56,20 @@ public class ConnectToPersistenceJob extends NetworkJob implements ServiceListen
         } else {
             connectToAdHocServer();
         }
+
     }
+
     private void loadXml() {
         final XMLLocomotiveService xmlLocomotiveService = new XMLLocomotiveService();
         final XMLTurnoutService xmlTurnoutService = new XMLTurnoutService();
         final XMLRouteService xmlRouteService = new XMLRouteService();
         final XMLServiceHelper xmlServiceHelper = new XMLServiceHelper();
 
-        locomotiveManager.setLocomotiveService(xmlLocomotiveService);
-        turnoutManager.setTurnoutService(xmlTurnoutService);
-        routeManager.setRouteService(xmlRouteService);
+        LocomotiveManager locomotiveManager = new LocomotiveManagerImpl(xmlLocomotiveService);
+        TurnoutManager turnoutManager = new TurnoutManagerImpl(xmlTurnoutService);
+        RouteManager routeManager = new RouteManagerImpl(turnoutManager, xmlRouteService);
 
-        locomotiveManager.initialize();
-        turnoutManager.initialize();
-        routeManager.initialize();
+        setManagersOnContext(locomotiveManager, turnoutManager, routeManager);
 
         InputStream inputStream = adHocRailwayApplication.getResources().openRawResource(R.raw.weekend_2014);
 
@@ -81,23 +81,38 @@ public class ConnectToPersistenceJob extends NetworkJob implements ServiceListen
         }
     }
 
+    private void setManagersOnContext(LocomotiveManager locomotiveManager, TurnoutManager turnoutManager, RouteManager routeManager) {
+        locomotiveManager.initialize();
+        turnoutManager.initialize();
+        routeManager.initialize();
+        persistenceContext.setTurnoutManager(turnoutManager);
+        persistenceContext.setRouteManager(routeManager);
+        persistenceContext.setLocomotiveManager(locomotiveManager);
+
+        turnoutManager.addTurnoutManagerListener(adHocRailwayApplication);
+        routeManager.addRouteManagerListener(adHocRailwayApplication);
+        locomotiveManager.addLocomotiveManagerListener(adHocRailwayApplication);
+    }
+
     private void connectToAdHocServer() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(adHocRailwayApplication);
         String adhocServerHost = sharedPref.getString(SettingsActivity.KEY_ADHOC_SERVER_HOST, AdHocRailwayApplication.SERVER_HOST);
         String url = "http://" + adhocServerHost + ":3000";
-        RestTurnoutService restTurnoutService = new RestTurnoutService(url, UUID.randomUUID().toString());
-        turnoutManager.setTurnoutService(restTurnoutService);
-        turnoutManager.initialize();
+        final String uuid = UUID.randomUUID().toString();
+        final SIOService sioService = new SIOService(uuid);
+        sioService.connect(url, this);
+        RestTurnoutService restTurnoutService = new RestTurnoutService(url, sioService, uuid);
 
-        RestRouteService restRouteService = new RestRouteService(url, UUID.randomUUID().toString());
-        routeManager.setRouteService(restRouteService);
-        routeManager.initialize();
+        RestRouteService restRouteService = new RestRouteService(url, sioService, uuid);
 
-        RestLocomotiveService restLocomotiveService = new RestLocomotiveService(url, UUID.randomUUID().toString());
-        locomotiveManager.setLocomotiveService(restLocomotiveService);
-        locomotiveManager.initialize();
+        RestLocomotiveService restLocomotiveService = new RestLocomotiveService(url, sioService, uuid);
 
-        SIOService.getInstance().connect(url, this);
+
+        LocomotiveManager locomotiveManager = new LocomotiveManagerImpl(restLocomotiveService);
+        TurnoutManager turnoutManager = new TurnoutManagerImpl(restTurnoutService);
+        RouteManager routeManager = new RouteManagerImpl(turnoutManager, restRouteService);
+
+        setManagersOnContext(locomotiveManager, turnoutManager, routeManager);
     }
 
     @Override

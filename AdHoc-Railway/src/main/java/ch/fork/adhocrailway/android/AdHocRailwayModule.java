@@ -3,7 +3,6 @@ package ch.fork.adhocrailway.android;
 import android.content.Context;
 
 import com.squareup.otto.Bus;
-import com.squareup.otto.ThreadEnforcer;
 
 import javax.inject.Singleton;
 
@@ -14,9 +13,6 @@ import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.manager.LocomotiveManager;
 import ch.fork.AdHocRailway.manager.RouteManager;
 import ch.fork.AdHocRailway.manager.TurnoutManager;
-import ch.fork.AdHocRailway.manager.impl.LocomotiveManagerImpl;
-import ch.fork.AdHocRailway.manager.impl.RouteManagerImpl;
-import ch.fork.AdHocRailway.manager.impl.TurnoutManagerImpl;
 import ch.fork.adhocrailway.android.activities.ConnectActivity;
 import ch.fork.adhocrailway.android.activities.ControllerActivity;
 import ch.fork.adhocrailway.android.activities.LocomotiveSelectActivity;
@@ -39,7 +35,7 @@ import dagger.Provides;
                 LocomotiveSelectActivity.class,
                 SettingsActivity.class,
                 ControllerFragment.class,
-                PowerFragment.class, ControllerPresenterImpl.class}
+                PowerFragment.class, ControllerPresenterImpl.class}, library = true
 )
 public class AdHocRailwayModule {
 
@@ -58,44 +54,53 @@ public class AdHocRailwayModule {
 
     @Provides
     @Singleton
-    public TurnoutManager providesTurnoutManager() {
-        return new TurnoutManagerImpl();
+    public RailwayDeviceContext providesRailwayDeviceContext() {
+        return new RailwayDeviceContext();
     }
 
     @Provides
     @Singleton
-    public RouteManager providesRouteManager(TurnoutManager turnoutManager) {
-        return new RouteManagerImpl(turnoutManager);
+    public PersistenceContext providesPersistenceContext() {
+        return new PersistenceContext(adHocRailwayApplication);
+    }
+
+    @Provides
+    public TurnoutManager providesTurnoutManager(PersistenceContext persistenceContext) {
+        return persistenceContext.getTurnoutManager();
+    }
+
+    @Provides
+    public RouteManager providesRouteManager(PersistenceContext persistenceContext) {
+        return persistenceContext.getRouteManager();
+    }
+
+    @Provides
+    public LocomotiveManager providesLocomotiveManager(PersistenceContext persistenceContext) {
+        return persistenceContext.getLocomotiveManager();
     }
 
     @Provides
     @Singleton
-    public LocomotiveManager providesLocomotiveManager() {
-        return new LocomotiveManagerImpl();
+    public TurnoutController providesTurnoutController(RailwayDeviceContext railwayDeviceContext) {
+        return railwayDeviceContext.getTurnoutController();
     }
 
     @Provides
     @Singleton
-    public TurnoutController providesTurnoutController() {
-        return adHocRailwayApplication.getTurnoutController();
+    public RouteController providesRouteController(RailwayDeviceContext railwayDeviceContext) {
+        return railwayDeviceContext.getRouteController();
     }
 
     @Provides
     @Singleton
-    public RouteController providesRouteController() {
-        return adHocRailwayApplication.getRouteController();
+    public LocomotiveController providesLocomotiveController(RailwayDeviceContext railwayDeviceContext) {
+        return railwayDeviceContext.getLocomotiveController();
     }
 
     @Provides
     @Singleton
-    public LocomotiveController providesLocomotiveController() {
-        return adHocRailwayApplication.getLocomotiveController();
-    }
-
-    @Provides
-    @Singleton
-    public PowerController providesPowerController() {
-        return adHocRailwayApplication.getPowerController();
+    public PowerController providesPowerController(RailwayDeviceContext railwayDeviceContext) {
+        return railwayDeviceContext.getPowerController();
     }
 
     @Provides
@@ -106,6 +111,6 @@ public class AdHocRailwayModule {
     @Provides
     @Singleton
     public Bus providesEventBus() {
-        return new Bus(ThreadEnforcer.ANY);
+        return MainThreadBus.getMainThreadBus();
     }
 }
