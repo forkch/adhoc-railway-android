@@ -48,6 +48,7 @@ public class AdHocRailwayModule {
     }
 
     @Provides
+    @Singleton
     public AdHocRailwayApplication providesAdHocRailwayApplication() {
         return this.adHocRailwayApplication;
     }
@@ -80,25 +81,21 @@ public class AdHocRailwayModule {
     }
 
     @Provides
-    @Singleton
     public TurnoutController providesTurnoutController(RailwayDeviceContext railwayDeviceContext) {
         return railwayDeviceContext.getTurnoutController();
     }
 
     @Provides
-    @Singleton
     public RouteController providesRouteController(RailwayDeviceContext railwayDeviceContext) {
         return railwayDeviceContext.getRouteController();
     }
 
     @Provides
-    @Singleton
     public LocomotiveController providesLocomotiveController(RailwayDeviceContext railwayDeviceContext) {
         return railwayDeviceContext.getLocomotiveController();
     }
 
     @Provides
-    @Singleton
     public PowerController providesPowerController(RailwayDeviceContext railwayDeviceContext) {
         return railwayDeviceContext.getPowerController();
     }

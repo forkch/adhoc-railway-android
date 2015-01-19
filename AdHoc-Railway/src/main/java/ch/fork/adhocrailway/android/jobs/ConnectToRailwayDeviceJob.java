@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import ch.fork.AdHocRailway.controllers.LocomotiveController;
 import ch.fork.AdHocRailway.controllers.PowerController;
 import ch.fork.AdHocRailway.controllers.RouteController;
+import ch.fork.AdHocRailway.controllers.TaskExecutor;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyLocomotiveController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyPowerController;
@@ -70,9 +71,11 @@ public class ConnectToRailwayDeviceJob extends NetworkJob {
             SRCPSession session = new SRCPSession(srcpServerHost, 4303);
             session.connect();
 
-            SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter();
+            final TaskExecutor taskExecutor = new TaskExecutor();
+
+            SRCPTurnoutControlAdapter srcpTurnoutControlAdapter = new SRCPTurnoutControlAdapter(taskExecutor);
             SRCPRouteControlAdapter srcpRouteControlAdapter = new SRCPRouteControlAdapter(srcpTurnoutControlAdapter, persistenceContext.getTurnoutManager());
-            SRCPLocomotiveControlAdapter srcpLocomotiveControlAdapter = new SRCPLocomotiveControlAdapter();
+            SRCPLocomotiveControlAdapter srcpLocomotiveControlAdapter = new SRCPLocomotiveControlAdapter(taskExecutor);
             SRCPPowerControlAdapter srcpPowerControlAdapter = new SRCPPowerControlAdapter();
 
             srcpTurnoutControlAdapter.setSession(session);
