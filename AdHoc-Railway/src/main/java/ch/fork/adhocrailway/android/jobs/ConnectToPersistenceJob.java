@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.squareup.otto.Produce;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -116,18 +118,21 @@ public class ConnectToPersistenceJob extends NetworkJob implements ServiceListen
     }
 
     @Override
+    @Produce
     public void connected() {
         Log.i(TAG, "connected to adhocserver");
         adHocRailwayApplication.postEvent(new InfoEvent(adHocRailwayApplication.getString(R.string.info_disconnected_to_adhocserver)));
     }
 
     @Override
+    @Produce
     public void connectionError(AdHocServiceException ex) {
         Log.e(TAG, "failed to connect to adhocserver", ex);
         adHocRailwayApplication.postEvent(new ExceptionEvent(adHocRailwayApplication.getString(R.string.error_connection_adhocserver), ex));
     }
 
     @Override
+    @Produce
     public void disconnected() {
         Log.i(TAG, "disconnected from adhocserver");
         adHocRailwayApplication.postEvent(new InfoEvent(adHocRailwayApplication.getString(R.string.info_disconnected_from_adhocserver)));

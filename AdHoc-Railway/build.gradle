@@ -17,20 +17,20 @@ configurations.all {
 dependencies {
     compile 'com.android.support:support-v4:19.+'
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile('ch.fork.adhocrailway:ch.fork.adhocrailway.persistence.adhocserver:2.5-SNAPSHOT') {
+    compile('ch.fork.adhocrailway:ch.fork.adhocrailway.persistence.adhocserver:2.5.0') {
         exclude group: 'xmlpull'
         exclude group: 'xpp3'
         exclude group: 'org.apache.commons'
         exclude group: 'commons-io'
     }
-    compile('ch.fork.adhocrailway:ch.fork.adhocrailway.persistence.xml:2.5-SNAPSHOT') {
+    compile('ch.fork.adhocrailway:ch.fork.adhocrailway.persistence.xml:2.5.0') {
         exclude group: 'xmlpull'
         exclude group: 'xpp3'
         exclude group: 'org.apache.commons'
         exclude group: 'commons-io'
 
     }
-    compile('ch.fork.adhocrailway:ch.fork.adhocrailway.railway.srcp:2.5-SNAPSHOT') {
+    compile('ch.fork.adhocrailway:ch.fork.adhocrailway.railway.srcp:2.5.0') {
         exclude group: 'xmlpull'
         exclude group: 'xpp3'
         exclude group: 'org.apache.commons'

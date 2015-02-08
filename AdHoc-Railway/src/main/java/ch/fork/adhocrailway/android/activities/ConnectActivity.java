@@ -124,6 +124,8 @@ public class ConnectActivity extends BaseActivity {
 
     @Subscribe
     public void onExceptionEvent(ExceptionEvent event) {
+        connectingProgress.setIndeterminate(false);
+        connectingProgress.setVisibility(View.INVISIBLE);
         Toast.makeText(this, event.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
