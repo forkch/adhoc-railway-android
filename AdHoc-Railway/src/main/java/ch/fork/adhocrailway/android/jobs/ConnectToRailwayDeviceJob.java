@@ -10,6 +10,7 @@ import ch.fork.AdHocRailway.controllers.TaskExecutor;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyLocomotiveController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyPowerController;
+import ch.fork.AdHocRailway.controllers.impl.dummy.DummyRailwayController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyRouteController;
 import ch.fork.AdHocRailway.controllers.impl.dummy.DummyTurnoutController;
 import ch.fork.AdHocRailway.model.power.PowerSupply;
@@ -54,10 +55,11 @@ public class ConnectToRailwayDeviceJob extends NetworkJob {
     }
 
     private void connectToDummySrcpService() {
-        TurnoutController turnoutController = new DummyTurnoutController();
+        DummyRailwayController dummyRailwayController = DummyRailwayController.getInstance();
+        TurnoutController turnoutController = new DummyTurnoutController(dummyRailwayController);
         RouteController routeController = new DummyRouteController(turnoutController, persistenceContext.getTurnoutManager());
-        LocomotiveController locomotiveController = new DummyLocomotiveController();
-        PowerController powerController = new DummyPowerController();
+        LocomotiveController locomotiveController = new DummyLocomotiveController(dummyRailwayController);
+        PowerController powerController = new DummyPowerController(dummyRailwayController);
 
         adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true));
     }
