@@ -474,7 +474,11 @@ public class ControllerFragment extends BaseFragment {
 
         @Override
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
-            turnoutController.setDefaultState(turnout);
+            if (turnout.isLinkedToRoute()) {
+                routeController.disableRoute(routeManager.getRouteByNumber(turnout.getLinkedRouteNumber()));
+            } else {
+                turnoutController.setDefaultState(turnout);
+            }
         }
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
@@ -487,7 +491,11 @@ public class ControllerFragment extends BaseFragment {
 
         @Override
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
-            turnoutController.setNonDefaultState(turnout);
+            if (turnout.isLinkedToRoute()) {
+                routeController.enableRoute(routeManager.getRouteByNumber(turnout.getLinkedRouteNumber()));
+            } else {
+                turnoutController.setNonDefaultState(turnout);
+            }
             storePreviousChangedObject(turnout);
         }
         @Override
@@ -502,7 +510,11 @@ public class ControllerFragment extends BaseFragment {
 
         @Override
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
-            turnoutController.setCurvedLeft(turnout);
+            if (turnout.isLinkedToRoute()) {
+                routeController.enableRoute(routeManager.getRouteByNumber(turnout.getLinkedRouteNumber()));
+            } else {
+                turnoutController.setCurvedLeft(turnout);
+            }
             storePreviousChangedObject(turnout);
         }
         @Override
@@ -515,7 +527,11 @@ public class ControllerFragment extends BaseFragment {
 
         @Override
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
-            turnoutController.setStraight(turnout);
+            if (turnout.isLinkedToRoute()) {
+                routeController.disableRoute(routeManager.getRouteByNumber(turnout.getLinkedRouteNumber()));
+            } else {
+                turnoutController.setStraight(turnout);
+            }
         }
         @Override
         protected void doPerformStateAction(RouteController routeController, Route routeByNumber) {
@@ -527,7 +543,11 @@ public class ControllerFragment extends BaseFragment {
 
         @Override
         protected void doPerformStateAction(TurnoutController turnoutController, Turnout turnout) {
-            turnoutController.setCurvedRight(turnout);
+            if (turnout.isLinkedToRoute()) {
+                routeController.enableRoute(routeManager.getRouteByNumber(turnout.getLinkedRouteNumber()));
+            } else {
+                turnoutController.setCurvedRight(turnout);
+            }
             storePreviousChangedObject(turnout);
         }
         @Override
