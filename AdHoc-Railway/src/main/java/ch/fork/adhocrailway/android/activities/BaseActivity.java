@@ -27,6 +27,11 @@ public abstract class BaseActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
         bus.unregister(this);
     }
 
