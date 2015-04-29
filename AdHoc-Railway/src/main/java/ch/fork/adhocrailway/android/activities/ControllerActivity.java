@@ -1,6 +1,7 @@
 package ch.fork.adhocrailway.android.activities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,7 +10,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.common.eventbus.Subscribe;
@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import ch.fork.AdHocRailway.controllers.PowerController;
 import ch.fork.adhocrailway.android.AdHocRailwayApplication;
 import ch.fork.adhocrailway.android.R;
 import ch.fork.adhocrailway.android.events.InfoEvent;
@@ -30,6 +31,9 @@ public class ControllerActivity extends BaseFragmentActivity implements Controll
     private static final int NUM_CONTROLLER_FRAGMENTS = 4;
     @Inject
     AdHocRailwayApplication adHocRailwayApplication;
+
+    @Inject
+    PowerController powerController;
 
     private ViewPager mPager;
 
@@ -83,7 +87,7 @@ public class ControllerActivity extends BaseFragmentActivity implements Controll
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.connect, menu);
+        getMenuInflater().inflate(R.menu.controller, menu);
         return true;
     }
 
@@ -95,6 +99,18 @@ public class ControllerActivity extends BaseFragmentActivity implements Controll
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+        if (id == R.id.booster_off) {
+            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    powerController.powerOff(powerController.getPowerSupply(1));
+                    return null;
+                }
+
+            };
+            asyncTask.execute();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -115,14 +131,14 @@ public class ControllerActivity extends BaseFragmentActivity implements Controll
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            findViewById(R.id.controller).setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            );
+//            findViewById(R.id.controller).setSystemUiVisibility(
+//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+//                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+//            );
         }
     }
 

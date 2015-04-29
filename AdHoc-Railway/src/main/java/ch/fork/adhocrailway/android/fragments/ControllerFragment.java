@@ -1,8 +1,10 @@
 package ch.fork.adhocrailway.android.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -98,6 +100,7 @@ public class ControllerFragment extends BaseFragment {
     private NumberControlState numberControlState = NumberControlState.TURNOUT;
     private TextView routeIndicator;
     private Deque<Object> previousChangedObjects = new ArrayDeque<Object>();
+    private Vibrator vibrator;
 
     public ControllerFragment() {
     }
@@ -157,6 +160,7 @@ public class ControllerFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+
         updateSelectedLocomotive();
     }
 
@@ -346,6 +350,9 @@ public class ControllerFragment extends BaseFragment {
         @Override
         public void onClick(View v) {
             controllerPresenter.stopLocomotive(selectedLocomotive);
+
+            locomotive1Seekbar.setProgress(0);
+
         }
     }
 
@@ -418,6 +425,8 @@ public class ControllerFragment extends BaseFragment {
                     } else {
                         handleRouteChange(enteredNumber);
                     }
+                    vibrator = (Vibrator) adHocRailwayApplication.getSystemService(Context.VIBRATOR_SERVICE);
+                    vibrator.vibrate(1000);
                     resetNumbers();
                 }
 
