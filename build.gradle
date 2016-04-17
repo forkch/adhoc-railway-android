@@ -5,13 +5,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
-        classpath 'org.robolectric:robolectric-gradle-plugin:0.12.+'
+        classpath 'com.android.tools.build:gradle:2.1.0-beta1'
     }
 }
 
 allprojects {
     repositories {
+        maven { url "https://jitpack.io" }
         mavenCentral()
     }
 }

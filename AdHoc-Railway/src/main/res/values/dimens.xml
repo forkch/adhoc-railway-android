@@ -3,7 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="bring_padding">4dp</dimen>
-    <dimen name="bring_margin">8dp</dimen>
+    <dimen name="bring_margin">4dp</dimen>
     <dimen name="bring_default_textSize">16sp</dimen>
     <dimen name="bring_notification_title_text_size">16sp</dimen>
     <dimen name="bring_notification_subtitle_text_size">12sp</dimen>

@@ -48,7 +48,7 @@ import ch.fork.adhocrailway.android.utils.ImageHelper;
 public class ControllerFragment extends BaseFragment {
 
     private static final String TAG = ControllerFragment.class.getSimpleName();
-    LinearLayout functionContainer;
+    ViewGroup functionContainer;
     @InjectView(R.id.locomotive1Speed)
     SeekBar locomotive1Seekbar;
     @InjectView(R.id.locomotive1Direction)
@@ -195,7 +195,7 @@ public class ControllerFragment extends BaseFragment {
 
         emergencyStopButton.setOnClickListener(new EmergencyStopListener());
 
-        functionContainer = (LinearLayout) fragmentView.findViewById(R.id.functionContainer);
+        functionContainer = (ViewGroup) fragmentView.findViewById(R.id.functionContainer);
 
         if (functionContainer != null) {
             for (int i = 0; i < 5; i++) {
