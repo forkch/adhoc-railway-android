@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ./gradlew --offline assembleDebug
-FILE=AdHoc-Railway/build/apk/*.apk
+FILE=AdHoc-Railway/build/outputs/apk/*.apk
 ssh baehnle@adhocserver 'rm -rf /var/www/adhoc-railway/artifacts-android && mkdir /var/www/adhoc-railway/artifacts-android'
 
 scp $FILE baehnle@adhocserver:~/AdHoc-Railway/
