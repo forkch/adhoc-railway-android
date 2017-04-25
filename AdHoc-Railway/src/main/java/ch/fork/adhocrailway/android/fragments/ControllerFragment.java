@@ -334,7 +334,7 @@ public class ControllerFragment extends BaseFragment {
         @Override
         public void onClick(View v) {
             controllerPresenter.emergencyStop(selectedLocomotive);
-
+            vibrate();
         }
     }
 
@@ -357,6 +357,7 @@ public class ControllerFragment extends BaseFragment {
         @Override
         public void onClick(View v) {
             controllerPresenter.toggleDirection(selectedLocomotive);
+            vibrate();
         }
     }
 
@@ -366,6 +367,7 @@ public class ControllerFragment extends BaseFragment {
             controllerPresenter.stopLocomotive(selectedLocomotive);
 
             locomotive1Seekbar.setProgress(0);
+            vibrate();
 
         }
     }
@@ -380,7 +382,14 @@ public class ControllerFragment extends BaseFragment {
         @Override
         public void onClick(View v) {
             controllerPresenter.toggleLocomotiveFunction(selectedLocomotive, functionNumber);
+
+            vibrate();
         }
+    }
+
+    private void vibrate() {
+        vibrator = (Vibrator) adHocRailwayApplication.getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(50);
     }
 
     private class SelectLocomotiveListener implements View.OnClickListener {
@@ -439,8 +448,6 @@ public class ControllerFragment extends BaseFragment {
                     } else {
                         handleRouteChange(enteredNumber);
                     }
-                    vibrator = (Vibrator) adHocRailwayApplication.getSystemService(Context.VIBRATOR_SERVICE);
-                    vibrator.vibrate(50);
                     resetNumbers();
                 }
 
@@ -451,6 +458,7 @@ public class ControllerFragment extends BaseFragment {
                         return;
                     }
                     doPerformStateAction(routeController, routeByNumber);
+                    vibrate();
                 }
 
                 private void handleTurnoutChange(int enteredNumber) {
@@ -460,6 +468,7 @@ public class ControllerFragment extends BaseFragment {
                         return;
                     }
                     doPerformStateAction(turnoutController, turnoutByNumber);
+                    vibrate();
                 }
             });
         }
@@ -486,6 +495,7 @@ public class ControllerFragment extends BaseFragment {
                                    } else {
                                        doPerformStateAction(routeController, (Route) obj);
                                    }
+                                   vibrate();
                                    updatePreviousChangedObject();
                                }
                            }
