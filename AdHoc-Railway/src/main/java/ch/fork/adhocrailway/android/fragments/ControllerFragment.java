@@ -28,8 +28,9 @@ import java.util.Deque;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+import butterknife.Unbinder;
 import ch.fork.AdHocRailway.controllers.LocomotiveController;
 import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
@@ -51,29 +52,29 @@ public class ControllerFragment extends BaseFragment {
 
     private static final String TAG = ControllerFragment.class.getSimpleName();
     ViewGroup functionContainer;
-    @InjectView(R.id.locomotive1Speed)
+    @BindView(R.id.locomotive1Speed)
     SeekBar locomotive1Seekbar;
-    @InjectView(R.id.locomotive1Direction)
+    @BindView(R.id.locomotive1Direction)
     Button directionButton;
-    @InjectView(R.id.locomotive1Stop)
+    @BindView(R.id.locomotive1Stop)
     Button stopButton;
-    @InjectView(R.id.locomotiveEmergencyStop)
+    @BindView(R.id.locomotiveEmergencyStop)
     Button emergencyStopButton;
-    @InjectView(R.id.selectedLocomotive)
+    @BindView(R.id.selectedLocomotive)
     LinearLayout selectedLocomotiveView;
 
-    @InjectView(R.id.turnoutButtonDefault)
+    @BindView(R.id.turnoutButtonDefault)
     Button defaultStateButton;
-    @InjectView(R.id.turnoutButtonNonDefault)
+    @BindView(R.id.turnoutButtonNonDefault)
     Button nonDefaultStateButton;
-    @InjectView(R.id.turnoutButtonLeft)
+    @BindView(R.id.turnoutButtonLeft)
     Button leftStateButton;
 
-    @InjectView(R.id.turnoutButtonRight)
+    @BindView(R.id.turnoutButtonRight)
     Button rightStateButton;
-    @InjectView(R.id.turnoutButtonStraight)
+    @BindView(R.id.turnoutButtonStraight)
     Button straightStateButton;
-    @InjectView(R.id.turnoutButtonPeriod)
+    @BindView(R.id.turnoutButtonPeriod)
     Button periodButton;
 
     @Inject
@@ -126,6 +127,17 @@ public class ControllerFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
+
+            final Locomotive oldLoco = selectedLocomotive;
+            if(selectedLocomotive != null) {
+                enqueueJob(new NetworkJob() {
+                    @Override
+                    public void onRun() throws Throwable {
+                        locomotiveController.terminateLocomotive(oldLoco);
+                    }
+                });
+            }
+
             selectedLocomotive = (Locomotive) data.getSerializableExtra("selectedLocomotive");
         }
     }
@@ -135,7 +147,7 @@ public class ControllerFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fragmentView = inflater.inflate(R.layout.fragment_main_controller, container, false);
-        ButterKnife.inject(this, fragmentView);
+        Unbinder unbinder = ButterKnife.bind(this, fragmentView);
         currentNumber = (TextView) fragmentView.findViewById(R.id.currentNumber);
         routeIndicator = (TextView) fragmentView.findViewById(R.id.routeIndicator);
 
@@ -145,6 +157,8 @@ public class ControllerFragment extends BaseFragment {
         return fragmentView;
 
     }
+
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -426,7 +440,7 @@ public class ControllerFragment extends BaseFragment {
                         handleRouteChange(enteredNumber);
                     }
                     vibrator = (Vibrator) adHocRailwayApplication.getSystemService(Context.VIBRATOR_SERVICE);
-                    vibrator.vibrate(1000);
+                    vibrator.vibrate(50);
                     resetNumbers();
                 }
 

@@ -153,7 +153,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:max="14" />
+            android:max="127" />
 
     </RelativeLayout>
 

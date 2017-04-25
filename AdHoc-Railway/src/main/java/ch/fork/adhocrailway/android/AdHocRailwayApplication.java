@@ -50,6 +50,8 @@ import ch.fork.adhocrailway.android.events.ExceptionEvent;
 import ch.fork.adhocrailway.android.jobs.ConnectToPersistenceJob;
 import ch.fork.adhocrailway.android.jobs.ConnectToRailwayDeviceJob;
 import dagger.ObjectGraph;
+import de.dermoba.srcp.client.CommandDataListener;
+import de.dermoba.srcp.client.InfoDataListener;
 import de.dermoba.srcp.client.SRCPSession;
 import de.dermoba.srcp.common.exception.SRCPException;
 import timber.log.Timber;
@@ -57,7 +59,7 @@ import timber.log.Timber;
 /**
  * Created by fork on 4/16/14.
  */
-public class AdHocRailwayApplication extends Application implements LocomotiveServiceListener, TurnoutManagerListener, RouteManagerListener, LocomotiveManagerListener {
+public class AdHocRailwayApplication extends Application implements LocomotiveServiceListener, TurnoutManagerListener, RouteManagerListener, LocomotiveManagerListener, CommandDataListener, InfoDataListener {
     public final static String TAG = AdHocRailwayApplication.class.getSimpleName();
     //private static final String SERVER_HOST = "adhocserver";
     public static final String SERVER_HOST = "forkch.dyndns.org";
@@ -189,6 +191,11 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     @Subscribe
     public void connectedEvent(ConnectedToRailwayDeviceEvent event) {
+
+        if(railwayDeviceContext.getSRCPSession() != null) {
+            railwayDeviceContext.getSRCPSession().getCommandChannel().addCommandDataListener(this);
+            railwayDeviceContext.getSRCPSession().getInfoChannel().addInfoDataListener(this);
+        }
     }
 
     @Override
@@ -316,6 +323,27 @@ public class AdHocRailwayApplication extends Application implements LocomotiveSe
 
     public JobManager getJobManager() {
         return jobManager;
+    }
+    @Override
+    public void commandDataReceived(String response) {
+        Timber.d("recv: %s", response);
+    }
+
+    @Override
+    public void commandDataSent(String request) {
+        Timber.d("sent: %s", request);
+    }
+
+    @Override
+    public void infoDataReceived(String infoData) {
+        Timber.i("infodata: recv %s", infoData);
+
+    }
+
+    @Override
+    public void infoDataSent(String infoData) {
+        Timber.i("infodata sent: %s", infoData);
+
     }
 
 

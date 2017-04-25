@@ -17,8 +17,8 @@ import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import ch.fork.AdHocRailway.manager.LocomotiveManager;
 import ch.fork.AdHocRailway.manager.RouteManager;
 import ch.fork.AdHocRailway.manager.TurnoutManager;
@@ -38,17 +38,17 @@ import ch.fork.adhocrailway.android.jobs.ConnectToRailwayDeviceJob;
 public class ConnectActivity extends BaseActivity {
 
     private static final String TAG = ConnectActivity.class.getSimpleName();
-    @InjectView(R.id.connectButton)
+    @BindView(R.id.connectButton)
     Button connectButton;
 
-    @InjectView(R.id.connectingProgress)
+    @BindView(R.id.connectingProgress)
     ProgressBar connectingProgress;
-    @InjectView(R.id.adhocServerHostTextView)
+    @BindView(R.id.adhocServerHostTextView)
     TextView adHocServerHostTextView;
-    @InjectView(R.id.srcpServerHostTextView)
+    @BindView(R.id.srcpServerHostTextView)
     TextView srcpServerHostTextView;
 
-    @InjectView(R.id.serversTextView)
+    @BindView(R.id.serversTextView)
     TextView serversTextView;
 
     @Inject
@@ -67,7 +67,7 @@ public class ConnectActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
         adHocRailwayApplication = (AdHocRailwayApplication) getApplication();
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
         initEventHandling();
     }
 
