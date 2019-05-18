@@ -125,6 +125,16 @@ public class PowerFragment extends Fragment implements PowerChangeListener {
 
     }
 
+    @Override
+    public void reset(String resetMessage) {
+
+    }
+
+    @Override
+    public void message(String receivedMessage) {
+
+    }
+
     public interface OnPowerFragmentInteractionListener {
     }
 

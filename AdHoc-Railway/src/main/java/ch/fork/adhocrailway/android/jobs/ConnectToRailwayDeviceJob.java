@@ -2,6 +2,7 @@ package ch.fork.adhocrailway.android.jobs;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import ch.fork.AdHocRailway.controllers.LocomotiveController;
 import ch.fork.AdHocRailway.controllers.PowerController;
@@ -106,6 +107,7 @@ public class ConnectToRailwayDeviceJob extends NetworkJob {
 
             adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(true));
         } catch (SRCPException e) {
+            Log.e(this.getClass().getSimpleName(), "failed to connect:", e);
             adHocRailwayApplication.postEvent(new ExceptionEvent(adHocRailwayApplication.getString(R.string.error_failed_to_connect_srcpserver), e));
             adHocRailwayApplication.postEvent(new ConnectedToRailwayDeviceEvent(false));
         }

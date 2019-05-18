@@ -61,8 +61,7 @@ import timber.log.Timber;
  */
 public class AdHocRailwayApplication extends Application implements LocomotiveServiceListener, TurnoutManagerListener, RouteManagerListener, LocomotiveManagerListener, CommandDataListener, InfoDataListener {
     public final static String TAG = AdHocRailwayApplication.class.getSimpleName();
-    //private static final String SERVER_HOST = "adhocserver";
-    public static final String SERVER_HOST = "forkch.dyndns.org";
+    public static final String SERVER_HOST = "192.168.11.10";
     protected ObjectGraph objectGraph;
     @Inject
     Bus bus;

@@ -99,6 +99,7 @@ public class ControllerPresenterImpl implements ControllerPresenter {
             public void onRun() throws Throwable {
                 boolean currentFunctionValue = selectedLocomotive.getCurrentFunctions()[functionNumber];
                 locomotiveController.setFunction(selectedLocomotive, functionNumber, !currentFunctionValue, 0);
+                bus.post(selectedLocomotive);
             }
         });
     }
