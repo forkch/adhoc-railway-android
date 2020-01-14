@@ -37,7 +37,6 @@ import ch.fork.AdHocRailway.controllers.RouteController;
 import ch.fork.AdHocRailway.controllers.TurnoutController;
 import ch.fork.AdHocRailway.manager.RouteManager;
 import ch.fork.AdHocRailway.manager.TurnoutManager;
-import ch.fork.AdHocRailway.manager.impl.events.LocomotivesUpdatedEvent;
 import ch.fork.AdHocRailway.model.locomotives.Locomotive;
 import ch.fork.AdHocRailway.model.turnouts.Route;
 import ch.fork.AdHocRailway.model.turnouts.Turnout;
@@ -145,7 +144,7 @@ public class ControllerFragment extends BaseFragment implements LocomotiveChange
             }
 
             selectedLocomotive = (Locomotive) data.getSerializableExtra("selectedLocomotive");
-                locomotiveController.addLocomotiveChangeListener(selectedLocomotive, this);
+            locomotiveController.addLocomotiveChangeListener(selectedLocomotive, this);
         }
     }
 
@@ -238,7 +237,11 @@ public class ControllerFragment extends BaseFragment implements LocomotiveChange
 
         if (selectedLocomotive != null) {
             label.setText(selectedLocomotive.getName());
-            ImageHelper.fillImageViewFromBase64ImageString(imageView, selectedLocomotive.getImageBase64());
+            if (StringUtils.isNotBlank(selectedLocomotive.getImageBase64())) {
+                ImageHelper.fillImageViewFromBase64ImageString(imageView, selectedLocomotive.getImageBase64());
+            } else {
+                imageView.setImageBitmap(null);
+            }
             locomotiveController.activateLoco(selectedLocomotive);
 
         } else {
